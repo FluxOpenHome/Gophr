@@ -1,7 +1,18 @@
+# Made for ESPHome compliant configuration
+# Gophr - Solar-Powered Moisture Sensor Device
+
+substitutions:
+  name: "gophr"
+  friendly_name: "Gophr"
+  software_version: "1.0.0"
+
 esphome:
-  name: moisture-sensor-device
+  name: "${name}"
+  friendly_name: "${friendly_name}"
   name_add_mac_suffix: true
-  friendly_name: "Moisture Sensor Device"
+  project:
+    name: "FluxOpenHome.Gophr"
+    version: "${software_version}"
   on_boot:
     priority: -100
     then:
@@ -11,7 +22,7 @@ esphome:
       - output.turn_on: aht20_enable_pin
       - output.turn_on: led_enable_pin
       - delay: 15s
-      
+
       # Set initial LED state
       - light.turn_on:
           id: status_led
@@ -20,7 +31,7 @@ esphome:
           green: 0%
           blue: 100%
           effect: "Pulse"
-      
+
       # Wait for sensor readings to be valid
       - wait_until:
           condition:
@@ -78,7 +89,7 @@ esphome:
       - lambda: |-
           ESP_LOGI("boot", "Boot complete - checking sleep conditions");
           id(awake_start_time) = millis();
-          
+
           // Check if we're in a scheduled wake window
           bool in_wake_window = false;
           auto time = id(homeassistant_time).now();
@@ -97,7 +108,7 @@ esphome:
                 int diff = current_minutes - wake_minutes;
                 if (diff >= 0 && diff <= 5) {
                   in_wake_window = true;
-                  ESP_LOGI("boot", "In wake window %d (wake at %02d:%02d, current %02d:%02d)", 
+                  ESP_LOGI("boot", "In wake window %d (wake at %02d:%02d, current %02d:%02d)",
                           i+1, wake_minutes/60, wake_minutes%60, time.hour, time.minute);
                   break;
                 }
@@ -107,139 +118,6 @@ esphome:
           id(scheduled_wake_active) = in_wake_window;
           ESP_LOGI("boot", "Ready - scheduled_wake=%d, sleep_disabled=%d", in_wake_window, id(sleep_disabled));
 
-deep_sleep:
-  id: deep_sleep_component
-  sleep_duration: 60min
-
-preferences:
-  flash_write_interval: 1min
-
-globals:
-  - id: last_m1_value
-    type: float
-    restore_value: true
-    initial_value: '0.0'
-  - id: last_m2_value
-    type: float
-    restore_value: true
-    initial_value: '0.0'
-  - id: last_m3_value
-    type: float
-    restore_value: true
-    initial_value: '0.0'
-  - id: sleep_duration_minutes
-    type: int
-    restore_value: true
-    initial_value: '60'
-  - id: sleep_disabled
-    type: bool
-    restore_value: true
-    initial_value: 'false'
-  - id: max_awake_minutes
-    type: int
-    restore_value: true
-    initial_value: '120'
-  - id: min_awake_minutes
-    type: int
-    restore_value: true
-    initial_value: '1'
-  - id: awake_start_time
-    type: unsigned long
-    restore_value: false
-    initial_value: '0'
-  - id: scheduled_wake_active
-    type: bool
-    restore_value: false
-    initial_value: 'false'
-  - id: data_collection_complete
-    type: bool
-    restore_value: false
-    initial_value: 'false'
-  - id: sensors_read_count
-    type: int
-    restore_value: false
-    initial_value: '0'
-  - id: ha_sleep_timer_active
-    type: bool
-    restore_value: false
-    initial_value: 'false'
-  - id: sleep_sequence_active
-    type: bool
-    restore_value: false
-    initial_value: 'false'
-  - id: wifi_sta_connected              # true only when STA is connected to Wi-Fi
-    type: bool
-    restore_value: false
-    initial_value: 'false'
-  
-  # Wake time globals (in minutes since midnight, -1 = disabled)
-  - id: wake_time_1_minutes
-    type: int
-    restore_value: true
-    initial_value: '-1'
-  - id: wake_time_2_minutes
-    type: int
-    restore_value: true
-    initial_value: '-1'
-  - id: wake_time_3_minutes
-    type: int
-    restore_value: true
-    initial_value: '-1'
-  - id: wake_time_4_minutes
-    type: int
-    restore_value: true
-    initial_value: '-1'
-  
-  # Sensor calibration values
-  - id: sensor1_dry_value
-    type: float
-    restore_value: true
-    initial_value: '1.979'
-  - id: sensor1_wet_value
-    type: float
-    restore_value: true
-    initial_value: '1.388'
-  - id: sensor1_dry_timestamp
-    type: std::string
-    restore_value: true
-    initial_value: '"Factory"'
-  - id: sensor1_wet_timestamp
-    type: std::string
-    restore_value: true
-    initial_value: '"Factory"'
-  - id: sensor2_dry_value
-    type: float
-    restore_value: true
-    initial_value: '1.979'
-  - id: sensor2_wet_value
-    type: float
-    restore_value: true
-    initial_value: '1.388'
-  - id: sensor2_dry_timestamp
-    type: std::string
-    restore_value: true
-    initial_value: '"Factory"'
-  - id: sensor2_wet_timestamp
-    type: std::string
-    restore_value: true
-    initial_value: '"Factory"'
-  - id: sensor3_dry_value
-    type: float
-    restore_value: true
-    initial_value: '2.046'
-  - id: sensor3_wet_value
-    type: float
-    restore_value: true
-    initial_value: '1.391'
-  - id: sensor3_dry_timestamp
-    type: std::string
-    restore_value: true
-    initial_value: '"Factory"'
-  - id: sensor3_wet_timestamp
-    type: std::string
-    restore_value: true
-    initial_value: '"Factory"'
-
 esp32:
   board: esp32-c3-devkitm-1
   framework:
@@ -247,6 +125,7 @@ esp32:
     version: recommended
 
 logger:
+  id: logger_component
   level: DEBUG
   logs:
     sensor: DEBUG
@@ -256,6 +135,80 @@ logger:
     i2c: DEBUG
     aht10: DEBUG
     esphome.components.i2c: DEBUG
+
+api:
+  id: homeassistant_api
+  on_client_connected:
+    - logger.log: "HA connected"
+    - light.turn_on:
+        id: status_led
+        brightness: 50%
+        red: 0%
+        green: 100%
+        blue: 0%
+        effect: "None"
+    - lambda: |-
+        // Only reset awake timer if we're NOT in a scheduled wake and NOT already in a sleep sequence
+        if (!id(scheduled_wake_active) && !id(sleep_sequence_active)) {
+          id(awake_start_time) = millis();
+          ESP_LOGI("awake", "HA connected - awake_start_time reset");
+        } else {
+          ESP_LOGI("awake", "HA connected during scheduled wake/sleep; not resetting timer");
+        }
+
+ota:
+  id: ota_component
+  platform: esphome
+  password: "9ff9b37785fc3e29b09d34faba179604"
+
+wifi:
+  id: wifi_component
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "${name}"
+  on_connect:
+    - if:
+        condition:
+          lambda: 'return !id(sleep_sequence_active);'
+        then:
+          - light.turn_on:
+              id: status_led
+              brightness: 30%
+              red: 0%
+              green: 100%
+              blue: 0%
+              effect: "None"
+          - logger.log: "WiFi connected - green LED"
+    - lambda: |-
+        id(wifi_sta_connected) = true;
+        ESP_LOGI("wifi", "STA connected: sleep is now allowed");
+  on_disconnect:
+    - if:
+        condition:
+          lambda: 'return !id(sleep_sequence_active);'
+        then:
+          - light.turn_on:
+              id: status_led
+              brightness: 30%
+              red: 0%
+              green: 0%
+              blue: 100%
+              effect: "Pulse"
+          - logger.log: "WiFi disconnected - blue pulsing LED"
+    - lambda: |-
+        id(wifi_sta_connected) = false;
+        ESP_LOGW("wifi", "STA disconnected: sleep is now blocked");
+
+captive_portal:
+  id: captive_portal_component
+
+preferences:
+  flash_write_interval: 1min
+
+deep_sleep:
+  id: deep_sleep_component
+  sleep_duration: 60min
 
 time:
   - platform: homeassistant
@@ -269,7 +222,7 @@ time:
               auto time = id(homeassistant_time).now();
               if (!time.is_valid()) return;
               if (id(sleep_disabled)) return;  // when sleep is disabled, we don't pre-arm scheduled wake
-              
+
               int current_minutes = time.hour * 60 + time.minute;
               // Check if any wake time matches current time (within 1 minute before)
               for (int i = 0; i < 4; i++) {
@@ -307,11 +260,11 @@ interval:
             }
             return;
           }
-          
+
           unsigned long now = millis();
           unsigned long awake_time_ms = now - id(awake_start_time);
           unsigned long max_awake_ms = id(max_awake_minutes) * 60UL * 1000UL;
-          
+
           bool should_sleep = false;
 
           // Force sleep if max awake time exceeded (but only if Wi-Fi is connected; gated above)
@@ -338,21 +291,21 @@ interval:
             ESP_LOGI("sleep_check", "Min awake reached (%d min) - going to sleep", id(min_awake_minutes));
             should_sleep = true;
           }
-          
+
           if (!should_sleep) return;
-          
+
           // Initiate sleep sequence
           ESP_LOGI("sleep", "Initiating sleep sequence");
           id(sleep_sequence_active) = true;
           id(last_m1_value) = id(moisture_1).state;
           id(last_m2_value) = id(moisture_2).state;
           id(last_m3_value) = id(moisture_3).state;
-          
+
           // Turn off all power-consuming components
           id(sensor_enable_pin).turn_off();
           id(aht20_enable_pin).turn_off();
           id(led_enable_pin).turn_off();  // Disable LED power (GPIO18 low)
-          
+
           auto call = id(status_led).turn_off();
           call.set_brightness(0.0f);
           call.set_rgb(0.0f, 0.0f, 0.0f);
@@ -415,76 +368,137 @@ interval:
             id(deep_sleep_component).begin_sleep();
           }
 
-api:
-  id: homeassistant_api
-  on_client_connected:
-    - logger.log: "HA connected"
-    - light.turn_on:
-        id: status_led
-        brightness: 50%
-        red: 0%
-        green: 100%
-        blue: 0%
-        effect: "None"
-    - lambda: |-
-        // Only reset awake timer if we're NOT in a scheduled wake and NOT already in a sleep sequence
-        if (!id(scheduled_wake_active) && !id(sleep_sequence_active)) {
-          id(awake_start_time) = millis();
-          ESP_LOGI("awake", "HA connected - awake_start_time reset");
-        } else {
-          ESP_LOGI("awake", "HA connected during scheduled wake/sleep; not resetting timer");
-        }
-
-ota:
-  platform: esphome
-  password: "9ff9b37785fc3e29b09d34faba179604"
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "Test-Gophr Fallback Hotspot"
-    password: "GuoifDMNWNNX"
-  on_connect:
-    - if:
-        condition:
-          lambda: 'return !id(sleep_sequence_active);'
-        then:
-          - light.turn_on:
-              id: status_led
-              brightness: 30%
-              red: 0%
-              green: 100%
-              blue: 0%
-              effect: "None"
-          - logger.log: "WiFi connected - green LED"
-    - lambda: |-
-        id(wifi_sta_connected) = true;
-        ESP_LOGI("wifi", "STA connected: sleep is now allowed");
-  on_disconnect:
-    - if:
-        condition:
-          lambda: 'return !id(sleep_sequence_active);'
-        then:
-          - light.turn_on:
-              id: status_led
-              brightness: 30%
-              red: 0%
-              green: 0%
-              blue: 100%
-              effect: "Pulse"
-          - logger.log: "WiFi disconnected - blue pulsing LED"
-    - lambda: |-
-        id(wifi_sta_connected) = false;
-        ESP_LOGW("wifi", "STA disconnected: sleep is now blocked");
-
-captive_portal:
-
 i2c:
   sda: GPIO19
   scl: GPIO9
   scan: true
   id: bus_a
+
+globals:
+  - id: last_m1_value
+    type: float
+    restore_value: true
+    initial_value: '0.0'
+  - id: last_m2_value
+    type: float
+    restore_value: true
+    initial_value: '0.0'
+  - id: last_m3_value
+    type: float
+    restore_value: true
+    initial_value: '0.0'
+  - id: sleep_duration_minutes
+    type: int
+    restore_value: true
+    initial_value: '60'
+  - id: sleep_disabled
+    type: bool
+    restore_value: true
+    initial_value: 'false'
+  - id: max_awake_minutes
+    type: int
+    restore_value: true
+    initial_value: '120'
+  - id: min_awake_minutes
+    type: int
+    restore_value: true
+    initial_value: '1'
+  - id: awake_start_time
+    type: unsigned long
+    restore_value: false
+    initial_value: '0'
+  - id: scheduled_wake_active
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+  - id: data_collection_complete
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+  - id: sensors_read_count
+    type: int
+    restore_value: false
+    initial_value: '0'
+  - id: ha_sleep_timer_active
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+  - id: sleep_sequence_active
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+  - id: wifi_sta_connected
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
+  # Wake time globals (in minutes since midnight, -1 = disabled)
+  - id: wake_time_1_minutes
+    type: int
+    restore_value: true
+    initial_value: '-1'
+  - id: wake_time_2_minutes
+    type: int
+    restore_value: true
+    initial_value: '-1'
+  - id: wake_time_3_minutes
+    type: int
+    restore_value: true
+    initial_value: '-1'
+  - id: wake_time_4_minutes
+    type: int
+    restore_value: true
+    initial_value: '-1'
+
+  # Sensor calibration values
+  - id: sensor1_dry_value
+    type: float
+    restore_value: true
+    initial_value: '1.979'
+  - id: sensor1_wet_value
+    type: float
+    restore_value: true
+    initial_value: '1.388'
+  - id: sensor1_dry_timestamp
+    type: std::string
+    restore_value: true
+    initial_value: '"Factory"'
+  - id: sensor1_wet_timestamp
+    type: std::string
+    restore_value: true
+    initial_value: '"Factory"'
+  - id: sensor2_dry_value
+    type: float
+    restore_value: true
+    initial_value: '1.979'
+  - id: sensor2_wet_value
+    type: float
+    restore_value: true
+    initial_value: '1.388'
+  - id: sensor2_dry_timestamp
+    type: std::string
+    restore_value: true
+    initial_value: '"Factory"'
+  - id: sensor2_wet_timestamp
+    type: std::string
+    restore_value: true
+    initial_value: '"Factory"'
+  - id: sensor3_dry_value
+    type: float
+    restore_value: true
+    initial_value: '2.046'
+  - id: sensor3_wet_value
+    type: float
+    restore_value: true
+    initial_value: '1.391'
+  - id: sensor3_dry_timestamp
+    type: std::string
+    restore_value: true
+    initial_value: '"Factory"'
+  - id: sensor3_wet_timestamp
+    type: std::string
+    restore_value: true
+    initial_value: '"Factory"'
 
 output:
   - platform: gpio
@@ -516,7 +530,7 @@ sensor:
   # --- Moisture RAW ADCs (with NaN/drop + median) ---
   - platform: adc
     pin: GPIO1
-    name: "Moisture Sensor 1"
+    name: "Moisture 1 Raw Voltage"
     id: moisture_1
     update_interval: 5s
     attenuation: 11db
@@ -543,11 +557,11 @@ sensor:
     state_class: "measurement"
     on_value:
       - lambda: |-
-          ESP_LOGD("adc_raw", "Moisture Sensor 1 raw ADC: %.3fV", x);
+          ESP_LOGD("adc_raw", "Moisture 1 raw ADC: %.3fV", x);
 
   - platform: adc
     pin: GPIO2
-    name: "Moisture Sensor 2"
+    name: "Moisture 2 Raw Voltage"
     id: moisture_2
     update_interval: 5s
     attenuation: 11db
@@ -574,11 +588,11 @@ sensor:
     state_class: "measurement"
     on_value:
       - lambda: |-
-          ESP_LOGD("adc_raw", "Moisture Sensor 2 raw ADC: %.3fV", x);
+          ESP_LOGD("adc_raw", "Moisture 2 raw ADC: %.3fV", x);
 
   - platform: adc
     pin: GPIO3
-    name: "Moisture Sensor 3"
+    name: "Moisture 3 Raw Voltage"
     id: moisture_3
     update_interval: 5s
     attenuation: 11db
@@ -605,7 +619,7 @@ sensor:
     state_class: "measurement"
     on_value:
       - lambda: |-
-          ESP_LOGD("adc_raw", "Moisture Sensor 3 raw ADC: %.3fV", x);
+          ESP_LOGD("adc_raw", "Moisture 3 raw ADC: %.3fV", x);
 
   # --- Power ADCs ---
   - platform: adc
@@ -660,13 +674,13 @@ sensor:
     variant: AHT20
     address: 0x38
     temperature:
-      name: "AHT20 Temperature"
+      name: "Temperature"
       id: aht20_temperature
       accuracy_decimals: 1
       device_class: "temperature"
       state_class: "measurement"
     humidity:
-      name: "AHT20 Humidity"
+      name: "Humidity"
       id: aht20_humidity
       accuracy_decimals: 1
       device_class: "humidity"
@@ -676,14 +690,16 @@ sensor:
   # --- Misc sensors ---
   - platform: wifi_signal
     name: "WiFi Signal Strength"
+    id: wifi_signal_strength
     update_interval: 60s
 
   - platform: uptime
     name: "Uptime"
+    id: uptime_sensor
 
   # --- Moisture % templates (publish NAN if raw is NaN) ---
   - platform: template
-    name: "Moisture Sensor 1 Percentage"
+    name: "Moisture 1 Percentage"
     id: moisture_1_percent
     update_interval: 5s
     unit_of_measurement: "%"
@@ -704,7 +720,7 @@ sensor:
       return roundf(percentage / 5.0f) * 5.0f;
 
   - platform: template
-    name: "Moisture Sensor 2 Percentage"
+    name: "Moisture 2 Percentage"
     id: moisture_2_percent
     update_interval: 5s
     unit_of_measurement: "%"
@@ -725,7 +741,7 @@ sensor:
       return roundf(percentage / 5.0f) * 5.0f;
 
   - platform: template
-    name: "Moisture Sensor 3 Percentage"
+    name: "Moisture 3 Percentage"
     id: moisture_3_percent
     update_interval: 5s
     unit_of_measurement: "%"
@@ -747,7 +763,7 @@ sensor:
 
   # --- Sleep/Timing helpers ---
   - platform: template
-    name: "Current Sleep Duration"
+    name: "Sleep Duration"
     id: current_sleep_duration_sensor
     lambda: |-
       return id(sleep_duration_minutes);
@@ -766,7 +782,7 @@ sensor:
     update_interval: 30s
 
   - platform: template
-    name: "Minutes to Next Wake"
+    name: "Minutes To Next Wake"
     id: minutes_to_next_wake
     unit_of_measurement: "min"
     accuracy_decimals: 0
@@ -811,13 +827,13 @@ binary_sensor:
     device_class: "connectivity"
 
   - platform: template
-    name: "In Scheduled Wake"
+    name: "Scheduled Wake Active"
     id: in_scheduled_wake
     lambda: |-
       return id(scheduled_wake_active);
 
   - platform: template
-    name: "WiFi STA Connected"
+    name: "WiFi Connected"
     id: wifi_sta_connected_bin
     device_class: connectivity
     lambda: |-
@@ -826,7 +842,7 @@ binary_sensor:
 text:
   - platform: template
     id: schedule_start_time_1
-    name: "Schedule Start Time 1 (24hr: 06:00 or 12hr: 6:00 AM)"
+    name: "Schedule Time 1"
     optimistic: true
     min_length: 0
     max_length: 8
@@ -871,7 +887,7 @@ text:
 
   - platform: template
     id: schedule_start_time_2
-    name: "Schedule Start Time 2 (Optional)"
+    name: "Schedule Time 2"
     optimistic: true
     min_length: 0
     max_length: 8
@@ -916,7 +932,7 @@ text:
 
   - platform: template
     id: schedule_start_time_3
-    name: "Schedule Start Time 3 (Optional)"
+    name: "Schedule Time 3"
     optimistic: true
     min_length: 0
     max_length: 8
@@ -961,7 +977,7 @@ text:
 
   - platform: template
     id: schedule_start_time_4
-    name: "Schedule Start Time 4 (Optional)"
+    name: "Schedule Time 4"
     optimistic: true
     min_length: 0
     max_length: 8
@@ -1006,7 +1022,7 @@ text:
 
 number:
   - platform: template
-    name: "Sleep Duration (Minutes)"
+    name: "Sleep Duration"
     id: sleep_duration_input
     icon: "mdi:sleep"
     min_value: 1
@@ -1026,7 +1042,7 @@ number:
           }
 
   - platform: template
-    name: "Max Awake Duration (Minutes)"
+    name: "Max Awake Duration"
     id: max_awake_input
     icon: "mdi:timer-outline"
     min_value: 10
@@ -1046,9 +1062,8 @@ number:
             ESP_LOGI("sleep", "Invalid max awake duration: %d minutes", (int)x);
           }
 
-  # NEW: Min Awake (when sleep is enabled)
   - platform: template
-    name: "Min Awake (Minutes)"
+    name: "Min Awake Duration"
     id: min_awake_input
     icon: "mdi:timer-sand"
     min_value: 0
@@ -1084,7 +1099,8 @@ switch:
 
 button:
   - platform: template
-    name: "Go to Sleep Now"
+    name: "Sleep Now"
+    id: sleep_now_button
     icon: "mdi:power-sleep"
     on_press:
       - logger.log: "MANUAL SLEEP REQUESTED"
@@ -1104,7 +1120,7 @@ button:
           ESP_LOGI("sleep", "Manual sleep - saved M1=%.3f, M2=%.3f, M3=%.3f", id(last_m1_value), id(last_m2_value), id(last_m3_value));
       - output.turn_off: sensor_enable_pin
       - output.turn_off: aht20_enable_pin
-      - output.turn_off: led_enable_pin  # Disable LED power (GPIO18 low)
+      - output.turn_off: led_enable_pin
       - lambda: |-
           auto call = id(status_led).turn_off();
           call.set_brightness(0.0f);
@@ -1157,6 +1173,7 @@ button:
 
   - platform: template
     name: "Factory Reset Calibration"
+    id: factory_reset_calibration_button
     icon: "mdi:factory"
     on_press:
       - lambda: |-
@@ -1175,7 +1192,8 @@ button:
           ESP_LOGI("calibration", "Factory reset completed");
 
   - platform: template
-    name: "Calibrate Sensor 1 Dry"
+    name: "Calibrate Moisture 1 Dry"
+    id: calibrate_moisture_1_dry_button
     icon: "mdi:water-minus"
     on_press:
       - lambda: |-
@@ -1184,8 +1202,8 @@ button:
           auto time = id(homeassistant_time).now();
           if (time.is_valid()) {
             char timestamp[64];
-            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d", 
-                   time.year, time.month, time.day_of_month, 
+            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
+                   time.year, time.month, time.day_of_month,
                    time.hour, time.minute, time.second);
             id(sensor1_dry_timestamp) = std::string(timestamp);
           } else {
@@ -1194,7 +1212,8 @@ button:
           ESP_LOGI("calibration", "Sensor 1 dry calibrated: %.3fV", current_voltage);
 
   - platform: template
-    name: "Calibrate Sensor 1 Wet"
+    name: "Calibrate Moisture 1 Wet"
+    id: calibrate_moisture_1_wet_button
     icon: "mdi:water-plus"
     on_press:
       - lambda: |-
@@ -1203,8 +1222,8 @@ button:
           auto time = id(homeassistant_time).now();
           if (time.is_valid()) {
             char timestamp[64];
-            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d", 
-                   time.year, time.month, time.day_of_month, 
+            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
+                   time.year, time.month, time.day_of_month,
                    time.hour, time.minute, time.second);
             id(sensor1_wet_timestamp) = std::string(timestamp);
           } else {
@@ -1213,7 +1232,8 @@ button:
           ESP_LOGI("calibration", "Sensor 1 wet calibrated: %.3fV", current_voltage);
 
   - platform: template
-    name: "Calibrate Sensor 2 Dry"
+    name: "Calibrate Moisture 2 Dry"
+    id: calibrate_moisture_2_dry_button
     icon: "mdi:water-minus"
     on_press:
       - lambda: |-
@@ -1222,8 +1242,8 @@ button:
           auto time = id(homeassistant_time).now();
           if (time.is_valid()) {
             char timestamp[64];
-            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d", 
-                   time.year, time.month, time.day_of_month, 
+            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
+                   time.year, time.month, time.day_of_month,
                    time.hour, time.minute, time.second);
             id(sensor2_dry_timestamp) = std::string(timestamp);
           } else {
@@ -1232,7 +1252,8 @@ button:
           ESP_LOGI("calibration", "Sensor 2 dry calibrated: %.3fV", current_voltage);
 
   - platform: template
-    name: "Calibrate Sensor 2 Wet"
+    name: "Calibrate Moisture 2 Wet"
+    id: calibrate_moisture_2_wet_button
     icon: "mdi:water-plus"
     on_press:
       - lambda: |-
@@ -1241,8 +1262,8 @@ button:
           auto time = id(homeassistant_time).now();
           if (time.is_valid()) {
             char timestamp[64];
-            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d", 
-                   time.year, time.month, time.day_of_month, 
+            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
+                   time.year, time.month, time.day_of_month,
                    time.hour, time.minute, time.second);
             id(sensor2_wet_timestamp) = std::string(timestamp);
           } else {
@@ -1251,7 +1272,8 @@ button:
           ESP_LOGI("calibration", "Sensor 2 wet calibrated: %.3fV", current_voltage);
 
   - platform: template
-    name: "Calibrate Sensor 3 Dry"
+    name: "Calibrate Moisture 3 Dry"
+    id: calibrate_moisture_3_dry_button
     icon: "mdi:water-minus"
     on_press:
       - lambda: |-
@@ -1260,8 +1282,8 @@ button:
           auto time = id(homeassistant_time).now();
           if (time.is_valid()) {
             char timestamp[64];
-            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d", 
-                   time.year, time.month, time.day_of_month, 
+            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
+                   time.year, time.month, time.day_of_month,
                    time.hour, time.minute, time.second);
             id(sensor3_dry_timestamp) = std::string(timestamp);
           } else {
@@ -1270,7 +1292,8 @@ button:
           ESP_LOGI("calibration", "Sensor 3 dry calibrated: %.3fV", current_voltage);
 
   - platform: template
-    name: "Calibrate Sensor 3 Wet"
+    name: "Calibrate Moisture 3 Wet"
+    id: calibrate_moisture_3_wet_button
     icon: "mdi:water-plus"
     on_press:
       - lambda: |-
@@ -1279,8 +1302,8 @@ button:
           auto time = id(homeassistant_time).now();
           if (time.is_valid()) {
             char timestamp[64];
-            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d", 
-                   time.year, time.month, time.day_of_month, 
+            sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
+                   time.year, time.month, time.day_of_month,
                    time.hour, time.minute, time.second);
             id(sensor3_wet_timestamp) = std::string(timestamp);
           } else {
