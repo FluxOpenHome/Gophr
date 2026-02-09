@@ -137,7 +137,7 @@ logger:
     esphome.components.i2c: DEBUG
 
 api:
-  id: homeassistant_api
+  id: api_server
   on_client_connected:
     - logger.log: "HA connected"
     - light.turn_on:
@@ -157,14 +157,15 @@ api:
         }
 
 ota:
-  id: ota_component
-  platform: esphome
-  password: "9ff9b37785fc3e29b09d34faba179604"
+  - id: ota_component
+    platform: esphome
+
+dashboard_import:
+  package_import_url: github://FluxOpenHome/Gophr/gophr.yaml@main
+  import_full_config: true
 
 wifi:
   id: wifi_component
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
   ap:
     ssid: "${name}"
   on_connect:
@@ -202,6 +203,18 @@ wifi:
 
 captive_portal:
   id: captive_portal_component
+
+esp32_improv:
+  id: esp32_improv_component
+  authorizer: none
+
+improv_serial:
+  id: improv_serial_component
+  next_url: http://{{ip_address}}
+
+web_server:
+  id: web_server_component
+  port: 80
 
 preferences:
   flash_write_interval: 1min
@@ -394,7 +407,7 @@ globals:
   - id: sleep_disabled
     type: bool
     restore_value: true
-    initial_value: 'false'
+    initial_value: 'true'
   - id: max_awake_minutes
     type: int
     restore_value: true
@@ -823,7 +836,7 @@ binary_sensor:
     name: "Home Assistant Connected"
     id: ha_connected
     lambda: |-
-      return id(homeassistant_api).is_connected();
+      return id(api_server).is_connected();
     device_class: "connectivity"
 
   - platform: template
