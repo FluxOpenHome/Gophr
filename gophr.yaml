@@ -377,6 +377,7 @@ interval:
 
             uint32_t sleep_time_ms = (uint32_t)effective_sleep_min * 60u * 1000u;
             ESP_LOGI("sleep", "Going to sleep for %d minutes (configured=%d)", effective_sleep_min, configured_sleep_min);
+            id(device_awake) = false;
             id(deep_sleep_component).set_sleep_duration(sleep_time_ms);
             id(deep_sleep_component).begin_sleep();
           }
@@ -444,6 +445,10 @@ globals:
     type: bool
     restore_value: false
     initial_value: 'false'
+  - id: device_awake
+    type: bool
+    restore_value: false
+    initial_value: 'true'
 
   # Wake time globals (in minutes since midnight, -1 = disabled)
   - id: wake_time_1_minutes
@@ -852,6 +857,12 @@ binary_sensor:
     lambda: |-
       return id(wifi_sta_connected);
 
+  - platform: template
+    name: "Device Awake"
+    id: device_awake_bin
+    lambda: |-
+      return id(device_awake);
+
 text:
   - platform: template
     id: schedule_start_time_1
@@ -1181,6 +1192,7 @@ button:
 
           uint32_t sleep_time_ms = (uint32_t)effective_sleep_min * 60u * 1000u;
           ESP_LOGI("sleep", "Manual sleep for %d minutes (configured=%d)", effective_sleep_min, configured_sleep_min);
+          id(device_awake) = false;
           id(deep_sleep_component).set_sleep_duration(sleep_time_ms);
           id(deep_sleep_component).begin_sleep();
 
