@@ -645,9 +645,7 @@ binary_sensor:
     name: "Solar Charging"
     id: solar_charging
     lambda: |-
-      float solar_v = id(solar_voltage).state;
-      float battery_v = id(battery_voltage).state;
-      return (solar_v > (battery_v + 0.3f));
+      return id(solar_voltage).state > 0.5f;
     device_class: "battery_charging"
 
   - platform: template
