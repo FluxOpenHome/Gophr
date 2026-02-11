@@ -47,76 +47,10 @@ esphome:
                   above: 0.9
           timeout: 30s
 
-      # Parse schedule strings into minutes on boot so wake minutes are set immediately
+      # Initialize boot state
       - lambda: |-
-          auto parse_minutes = [](const std::string &s_in) -> int {
-            std::string s = s_in;
-            auto ltrim = [](std::string &x){ x.erase(0, x.find_first_not_of(" \t\r\n")); };
-            auto rtrim = [](std::string &x){ x.erase(x.find_last_not_of(" \t\r\n")+1); };
-            ltrim(s); rtrim(s);
-            if (s.empty()) return -1;  // disabled
-            bool has_ampm = false, pm = false;
-            std::string s_low = s;
-            for (auto &c : s_low) c = tolower(c);
-            if (s_low.find("am") != std::string::npos || s_low.find("pm") != std::string::npos) {
-              has_ampm = true;
-              pm = (s_low.find("pm") != std::string::npos);
-              size_t p = s_low.find("am"); if (p == std::string::npos) p = s_low.find("pm");
-              s = s.substr(0, p);
-              rtrim(s);
-            }
-            size_t cpos = s.find(':');
-            if (cpos == std::string::npos) return -1;
-            int hh = atoi(s.substr(0, cpos).c_str());
-            int mm = atoi(s.substr(cpos+1).c_str());
-            if (mm < 0 || mm > 59) return -1;
-            if (has_ampm) {
-              if (hh == 12) hh = 0;  // 12 AM -> 0
-              if (pm) hh += 12;
-            }
-            if (hh < 0 || hh > 23) return -1;
-            return hh * 60 + mm;
-          };
-          id(wake_time_1_minutes) = parse_minutes(id(schedule_start_time_1).state);
-          id(wake_time_2_minutes) = parse_minutes(id(schedule_start_time_2).state);
-          id(wake_time_3_minutes) = parse_minutes(id(schedule_start_time_3).state);
-          id(wake_time_4_minutes) = parse_minutes(id(schedule_start_time_4).state);
-          ESP_LOGI("schedule_boot", "Wake1=%d, Wake2=%d, Wake3=%d, Wake4=%d",
-                   id(wake_time_1_minutes), id(wake_time_2_minutes),
-                   id(wake_time_3_minutes), id(wake_time_4_minutes));
-
-      # Check wake time and sleep logic on boot
-      - lambda: |-
-          ESP_LOGI("boot", "Boot complete - checking sleep conditions");
+          ESP_LOGI("boot", "Boot complete");
           id(awake_start_time) = millis();
-
-          // Check if we're in a scheduled wake window
-          bool in_wake_window = false;
-          auto time = id(homeassistant_time).now();
-          if (time.is_valid()) {
-            int current_minutes = time.hour * 60 + time.minute;
-            for (int i = 0; i < 4; i++) {
-              int wake_minutes = -1;
-              switch(i) {
-                case 0: wake_minutes = id(wake_time_1_minutes); break;
-                case 1: wake_minutes = id(wake_time_2_minutes); break;
-                case 2: wake_minutes = id(wake_time_3_minutes); break;
-                case 3: wake_minutes = id(wake_time_4_minutes); break;
-              }
-              if (wake_minutes >= 0) {
-                // Check if current time is within 5 minutes after wake time
-                int diff = current_minutes - wake_minutes;
-                if (diff >= 0 && diff <= 5) {
-                  in_wake_window = true;
-                  ESP_LOGI("boot", "In wake window %d (wake at %02d:%02d, current %02d:%02d)",
-                          i+1, wake_minutes/60, wake_minutes%60, time.hour, time.minute);
-                  break;
-                }
-              }
-            }
-          }
-          id(scheduled_wake_active) = in_wake_window;
-          ESP_LOGI("boot", "Ready - scheduled_wake=%d, sleep_disabled=%d", in_wake_window, id(sleep_disabled));
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -148,12 +82,9 @@ api:
         blue: 0%
         effect: "None"
     - lambda: |-
-        // Only reset awake timer if we're NOT in a scheduled wake and NOT already in a sleep sequence
-        if (!id(scheduled_wake_active) && !id(sleep_sequence_active)) {
+        if (!id(sleep_sequence_active)) {
           id(awake_start_time) = millis();
           ESP_LOGI("awake", "HA connected - awake_start_time reset");
-        } else {
-          ESP_LOGI("awake", "HA connected during scheduled wake/sleep; not resetting timer");
         }
 
 ota:
@@ -226,36 +157,6 @@ deep_sleep:
 time:
   - platform: homeassistant
     id: homeassistant_time
-    on_time:
-      # Check every minute if we should wake up for scheduled times
-      - seconds: 0
-        then:
-          - lambda: |-
-              if (id(sleep_sequence_active)) return;
-              auto time = id(homeassistant_time).now();
-              if (!time.is_valid()) return;
-              if (id(sleep_disabled)) return;  // when sleep is disabled, we don't pre-arm scheduled wake
-
-              int current_minutes = time.hour * 60 + time.minute;
-              // Check if any wake time matches current time (within 1 minute before)
-              for (int i = 0; i < 4; i++) {
-                int wake_minutes = -1;
-                switch(i) {
-                  case 0: wake_minutes = id(wake_time_1_minutes); break;
-                  case 1: wake_minutes = id(wake_time_2_minutes); break;
-                  case 2: wake_minutes = id(wake_time_3_minutes); break;
-                  case 3: wake_minutes = id(wake_time_4_minutes); break;
-                }
-                if (wake_minutes >= 0) {
-                  // Wake up 1 minute before scheduled time
-                  if (current_minutes == (wake_minutes - 1 + 1440) % 1440) {
-                    ESP_LOGI("scheduled_wake", "Preparing for wake time %d in 1 minute", i+1);
-                    id(scheduled_wake_active) = true;
-                    id(awake_start_time) = millis();
-                    break;
-                  }
-                }
-              }
 
 interval:
   # Check sleep conditions every 30 seconds
@@ -265,14 +166,10 @@ interval:
           if (id(sleep_sequence_active)) return;
 
           // --- HARD GATE: never sleep unless STA Wi-Fi is connected ---
-          if (!id(wifi_sta_connected)) {
-            // Stay awake; cancel any pending scheduled wake and do nothing
-            if (id(scheduled_wake_active)) {
-              ESP_LOGW("wifi_gate", "Wi-Fi not connected; canceling scheduled wake window and preventing sleep");
-              id(scheduled_wake_active) = false;
-            }
-            return;
-          }
+          if (!id(wifi_sta_connected)) return;
+
+          // Don't sleep if sleep is disabled
+          if (id(sleep_disabled)) return;
 
           unsigned long now = millis();
           unsigned long awake_time_ms = now - id(awake_start_time);
@@ -280,27 +177,13 @@ interval:
 
           bool should_sleep = false;
 
-          // Force sleep if max awake time exceeded (but only if Wi-Fi is connected; gated above)
+          // Force sleep if max awake time exceeded
           if (awake_time_ms > max_awake_ms) {
             ESP_LOGI("sleep_check", "Max awake time exceeded (%d min) - forcing sleep", id(max_awake_minutes));
-            id(scheduled_wake_active) = false;
             should_sleep = true;
           }
-          // Scheduled wake active logic
-          else if (id(scheduled_wake_active)) {
-            if (!id(sleep_disabled)) {
-              // Default: stay awake ~5 minutes around scheduled wake
-              if (awake_time_ms > (5UL * 60UL * 1000UL)) {
-                ESP_LOGI("sleep_check", "Scheduled wake window expired (5min) - going to sleep");
-                id(scheduled_wake_active) = false;
-                should_sleep = true;
-              }
-            } else {
-              ESP_LOGD("sleep_check", "Scheduled wake but sleep is disabled - staying awake");
-            }
-          }
-          // Normal (unscheduled) behavior: sleep enabled -> sleep after MIN awake time
-          else if (!id(sleep_disabled) && (awake_time_ms > (id(min_awake_minutes) * 60UL * 1000UL))) {
+          // Sleep after min awake time
+          else if (awake_time_ms > (id(min_awake_minutes) * 60UL * 1000UL)) {
             ESP_LOGI("sleep_check", "Min awake reached (%d min) - going to sleep", id(min_awake_minutes));
             should_sleep = true;
           }
@@ -310,29 +193,38 @@ interval:
           // Initiate sleep sequence
           ESP_LOGI("sleep", "Initiating sleep sequence");
           id(sleep_sequence_active) = true;
+          id(sleep_sequence_start_time) = millis();
           id(last_m1_value) = id(moisture_1).state;
           id(last_m2_value) = id(moisture_2).state;
           id(last_m3_value) = id(moisture_3).state;
 
-          // Turn off all power-consuming components
+          // Turn off sensors, LED, and mark device as not awake
           id(sensor_enable_pin).turn_off();
           id(aht20_enable_pin).turn_off();
-          id(led_enable_pin).turn_off();  // Disable LED power (GPIO18 low)
-
+          id(device_awake) = false;
           auto call = id(status_led).turn_off();
           call.set_brightness(0.0f);
           call.set_rgb(0.0f, 0.0f, 0.0f);
           call.perform();
+          id(led_enable_pin).turn_off();
 
-  # Execute actual sleep after 2 seconds delay (CLIPS to next scheduled wake)
+  # Check every 2s; only sleep once 5s have passed so states propagate to HA
   - interval: 2s
     then:
       - lambda: |-
           if (id(sleep_sequence_active)) {
+            // Wait at least 5 seconds for LED-off and device_awake states to reach HA
+            unsigned long elapsed = millis() - id(sleep_sequence_start_time);
+            if (elapsed < 5000) {
+              ESP_LOGD("sleep", "Waiting for states to propagate (%lu ms elapsed)", elapsed);
+              return;
+            }
+
             // Guard again right before sleeping: if Wi-Fi dropped, abort sleep.
             if (!id(wifi_sta_connected)) {
               ESP_LOGW("wifi_gate", "Wi-Fi lost during sleep sequence; aborting sleep and re-enabling power rails");
               id(sleep_sequence_active) = false;
+              id(device_awake) = true;
               id(sensor_enable_pin).turn_on();
               id(aht20_enable_pin).turn_on();
               id(led_enable_pin).turn_on();
@@ -343,41 +235,8 @@ interval:
               return;
             }
 
-            auto nowt = id(homeassistant_time).now();
-            int mins_to_next_wake = -1;
-            if (nowt.is_valid()) {
-              int cur = nowt.hour * 60 + nowt.minute;
-              auto next_delta = [&](int wake_m) -> int {
-                if (wake_m < 0) return -1;
-                int d = wake_m - cur;
-                if (d < 0) d += 1440;  // wrap to next day
-                return d;
-              };
-              int deltas[4] = {
-                next_delta(id(wake_time_1_minutes)),
-                next_delta(id(wake_time_2_minutes)),
-                next_delta(id(wake_time_3_minutes)),
-                next_delta(id(wake_time_4_minutes))
-              };
-              for (int i = 0; i < 4; i++) {
-                if (deltas[i] >= 0) {
-                  if (mins_to_next_wake < 0 || deltas[i] < mins_to_next_wake) mins_to_next_wake = deltas[i];
-                }
-              }
-            }
-
-            int configured_sleep_min = id(sleep_duration_minutes);
-            int effective_sleep_min = configured_sleep_min;
-
-            // If a scheduled wake occurs sooner than our configured sleep, clip to it
-            if (mins_to_next_wake >= 0 && mins_to_next_wake < effective_sleep_min) {
-              effective_sleep_min = (mins_to_next_wake < 1) ? 1 : mins_to_next_wake;  // at least 1 minute
-              ESP_LOGI("sleep", "Clipping sleep to %d min to hit next wake", effective_sleep_min);
-            }
-
-            uint32_t sleep_time_ms = (uint32_t)effective_sleep_min * 60u * 1000u;
-            ESP_LOGI("sleep", "Going to sleep for %d minutes (configured=%d)", effective_sleep_min, configured_sleep_min);
-            id(device_awake) = false;
+            uint32_t sleep_time_ms = (uint32_t)id(sleep_duration_minutes) * 60u * 1000u;
+            ESP_LOGI("sleep", "Going to sleep for %d minutes", id(sleep_duration_minutes));
             id(deep_sleep_component).set_sleep_duration(sleep_time_ms);
             id(deep_sleep_component).begin_sleep();
           }
@@ -421,10 +280,6 @@ globals:
     type: unsigned long
     restore_value: false
     initial_value: '0'
-  - id: scheduled_wake_active
-    type: bool
-    restore_value: false
-    initial_value: 'false'
   - id: data_collection_complete
     type: bool
     restore_value: false
@@ -441,6 +296,10 @@ globals:
     type: bool
     restore_value: false
     initial_value: 'false'
+  - id: sleep_sequence_start_time
+    type: unsigned long
+    restore_value: false
+    initial_value: '0'
   - id: wifi_sta_connected
     type: bool
     restore_value: false
@@ -449,24 +308,6 @@ globals:
     type: bool
     restore_value: false
     initial_value: 'true'
-
-  # Wake time globals (in minutes since midnight, -1 = disabled)
-  - id: wake_time_1_minutes
-    type: int
-    restore_value: true
-    initial_value: '-1'
-  - id: wake_time_2_minutes
-    type: int
-    restore_value: true
-    initial_value: '-1'
-  - id: wake_time_3_minutes
-    type: int
-    restore_value: true
-    initial_value: '-1'
-  - id: wake_time_4_minutes
-    type: int
-    restore_value: true
-    initial_value: '-1'
 
   # Sensor calibration values
   - id: sensor1_dry_value
@@ -799,34 +640,6 @@ sensor:
     accuracy_decimals: 0
     update_interval: 30s
 
-  - platform: template
-    name: "Minutes To Next Wake"
-    id: minutes_to_next_wake
-    unit_of_measurement: "min"
-    accuracy_decimals: 0
-    update_interval: 30s
-    lambda: |-
-      auto nowt = id(homeassistant_time).now();
-      if (!nowt.is_valid()) return NAN;
-      int cur = nowt.hour * 60 + nowt.minute;
-      auto next_delta = [&](int wake_m) -> int {
-        if (wake_m < 0) return -1;
-        int d = wake_m - cur;
-        if (d < 0) d += 1440;
-        return d;
-      };
-      int best = -1;
-      int arr[4] = {
-        next_delta(id(wake_time_1_minutes)),
-        next_delta(id(wake_time_2_minutes)),
-        next_delta(id(wake_time_3_minutes)),
-        next_delta(id(wake_time_4_minutes))
-      };
-      for (int i = 0; i < 4; i++) {
-        if (arr[i] >= 0 && (best < 0 || arr[i] < best)) best = arr[i];
-      }
-      return (best >= 0) ? best : NAN;
-
 binary_sensor:
   - platform: template
     name: "Solar Charging"
@@ -845,12 +658,6 @@ binary_sensor:
     device_class: "connectivity"
 
   - platform: template
-    name: "Scheduled Wake Active"
-    id: in_scheduled_wake
-    lambda: |-
-      return id(scheduled_wake_active);
-
-  - platform: template
     name: "WiFi Connected"
     id: wifi_sta_connected_bin
     device_class: connectivity
@@ -862,187 +669,6 @@ binary_sensor:
     id: device_awake_bin
     lambda: |-
       return id(device_awake);
-
-text:
-  - platform: template
-    id: schedule_start_time_1
-    name: "Schedule Time 1"
-    optimistic: true
-    min_length: 0
-    max_length: 8
-    mode: text
-    restore_value: true
-    entity_category: config
-    initial_value: "06:00"
-    on_value:
-      - lambda: |-
-          auto parse_minutes = [](const std::string &s_in) -> int {
-            std::string s = s_in;
-            auto ltrim = [](std::string &x){ x.erase(0, x.find_first_not_of(" \t\r\n")); };
-            auto rtrim = [](std::string &x){ x.erase(x.find_last_not_of(" \t\r\n")+1); };
-            ltrim(s); rtrim(s);
-            if (s.empty()) return -1;
-            bool has_ampm = false, pm = false;
-            std::string s_low = s;
-            for (auto &c : s_low) c = tolower(c);
-            if (s_low.find("am") != std::string::npos || s_low.find("pm") != std::string::npos) {
-              has_ampm = true;
-              pm = (s_low.find("pm") != std::string::npos);
-              size_t p = s_low.find("am"); if (p == std::string::npos) p = s_low.find("pm");
-              s = s.substr(0, p);
-              rtrim(s);
-            }
-            size_t cpos = s.find(':');
-            if (cpos == std::string::npos) return -1;
-            int hh = atoi(s.substr(0, cpos).c_str());
-            int mm = atoi(s.substr(cpos+1).c_str());
-            if (mm < 0 || mm > 59) return -1;
-            if (has_ampm) {
-              if (hh == 12) hh = 0;
-              if (pm) hh += 12;
-            }
-            if (hh < 0 || hh > 23) return -1;
-            return hh * 60 + mm;
-          };
-          int mins = parse_minutes(id(schedule_start_time_1).state);
-          id(wake_time_1_minutes) = mins;
-          if (mins >= 0) ESP_LOGI("schedule", "Wake 1 set to %02d:%02d (%d)", mins/60, mins%60, mins);
-          else ESP_LOGI("schedule", "Wake 1 disabled");
-
-  - platform: template
-    id: schedule_start_time_2
-    name: "Schedule Time 2"
-    optimistic: true
-    min_length: 0
-    max_length: 8
-    mode: text
-    restore_value: true
-    entity_category: config
-    initial_value: ""
-    on_value:
-      - lambda: |-
-          auto parse_minutes = [](const std::string &s_in) -> int {
-            std::string s = s_in;
-            auto ltrim = [](std::string &x){ x.erase(0, x.find_first_not_of(" \t\r\n")); };
-            auto rtrim = [](std::string &x){ x.erase(x.find_last_not_of(" \t\r\n")+1); };
-            ltrim(s); rtrim(s);
-            if (s.empty()) return -1;
-            bool has_ampm = false, pm = false;
-            std::string s_low = s;
-            for (auto &c : s_low) c = tolower(c);
-            if (s_low.find("am") != std::string::npos || s_low.find("pm") != std::string::npos) {
-              has_ampm = true;
-              pm = (s_low.find("pm") != std::string::npos);
-              size_t p = s_low.find("am"); if (p == std::string::npos) p = s_low.find("pm");
-              s = s.substr(0, p);
-              rtrim(s);
-            }
-            size_t cpos = s.find(':');
-            if (cpos == std::string::npos) return -1;
-            int hh = atoi(s.substr(0, cpos).c_str());
-            int mm = atoi(s.substr(cpos+1).c_str());
-            if (mm < 0 || mm > 59) return -1;
-            if (has_ampm) {
-              if (hh == 12) hh = 0;
-              if (pm) hh += 12;
-            }
-            if (hh < 0 || hh > 23) return -1;
-            return hh * 60 + mm;
-          };
-          int mins = parse_minutes(id(schedule_start_time_2).state);
-          id(wake_time_2_minutes) = mins;
-          if (mins >= 0) ESP_LOGI("schedule", "Wake 2 set to %02d:%02d (%d)", mins/60, mins%60, mins);
-          else ESP_LOGI("schedule", "Wake 2 disabled");
-
-  - platform: template
-    id: schedule_start_time_3
-    name: "Schedule Time 3"
-    optimistic: true
-    min_length: 0
-    max_length: 8
-    mode: text
-    restore_value: true
-    entity_category: config
-    initial_value: ""
-    on_value:
-      - lambda: |-
-          auto parse_minutes = [](const std::string &s_in) -> int {
-            std::string s = s_in;
-            auto ltrim = [](std::string &x){ x.erase(0, x.find_first_not_of(" \t\r\n")); };
-            auto rtrim = [](std::string &x){ x.erase(x.find_last_not_of(" \t\r\n")+1); };
-            ltrim(s); rtrim(s);
-            if (s.empty()) return -1;
-            bool has_ampm = false, pm = false;
-            std::string s_low = s;
-            for (auto &c : s_low) c = tolower(c);
-            if (s_low.find("am") != std::string::npos || s_low.find("pm") != std::string::npos) {
-              has_ampm = true;
-              pm = (s_low.find("pm") != std::string::npos);
-              size_t p = s_low.find("am"); if (p == std::string::npos) p = s_low.find("pm");
-              s = s.substr(0, p);
-              rtrim(s);
-            }
-            size_t cpos = s.find(':');
-            if (cpos == std::string::npos) return -1;
-            int hh = atoi(s.substr(0, cpos).c_str());
-            int mm = atoi(s.substr(cpos+1).c_str());
-            if (mm < 0 || mm > 59) return -1;
-            if (has_ampm) {
-              if (hh == 12) hh = 0;
-              if (pm) hh += 12;
-            }
-            if (hh < 0 || hh > 23) return -1;
-            return hh * 60 + mm;
-          };
-          int mins = parse_minutes(id(schedule_start_time_3).state);
-          id(wake_time_3_minutes) = mins;
-          if (mins >= 0) ESP_LOGI("schedule", "Wake 3 set to %02d:%02d (%d)", mins/60, mins%60, mins);
-          else ESP_LOGI("schedule", "Wake 3 disabled");
-
-  - platform: template
-    id: schedule_start_time_4
-    name: "Schedule Time 4"
-    optimistic: true
-    min_length: 0
-    max_length: 8
-    mode: text
-    restore_value: true
-    entity_category: config
-    initial_value: ""
-    on_value:
-      - lambda: |-
-          auto parse_minutes = [](const std::string &s_in) -> int {
-            std::string s = s_in;
-            auto ltrim = [](std::string &x){ x.erase(0, x.find_first_not_of(" \t\r\n")); };
-            auto rtrim = [](std::string &x){ x.erase(x.find_last_not_of(" \t\r\n")+1); };
-            ltrim(s); rtrim(s);
-            if (s.empty()) return -1;
-            bool has_ampm = false, pm = false;
-            std::string s_low = s;
-            for (auto &c : s_low) c = tolower(c);
-            if (s_low.find("am") != std::string::npos || s_low.find("pm") != std::string::npos) {
-              has_ampm = true;
-              pm = (s_low.find("pm") != std::string::npos);
-              size_t p = s_low.find("am"); if (p == std::string::npos) p = s_low.find("pm");
-              s = s.substr(0, p);
-              rtrim(s);
-            }
-            size_t cpos = s.find(':');
-            if (cpos == std::string::npos) return -1;
-            int hh = atoi(s.substr(0, cpos).c_str());
-            int mm = atoi(s.substr(cpos+1).c_str());
-            if (mm < 0 || mm > 59) return -1;
-            if (has_ampm) {
-              if (hh == 12) hh = 0;
-              if (pm) hh += 12;
-            }
-            if (hh < 0 || hh > 23) return -1;
-            return hh * 60 + mm;
-          };
-          int mins = parse_minutes(id(schedule_start_time_4).state);
-          id(wake_time_4_minutes) = mins;
-          if (mins >= 0) ESP_LOGI("schedule", "Wake 4 set to %02d:%02d (%d)", mins/60, mins%60, mins);
-          else ESP_LOGI("schedule", "Wake 4 disabled");
 
 number:
   - platform: template
@@ -1137,62 +763,39 @@ button:
           id(sleep_disabled) = false; // Force enable sleep
           id(ha_sleep_timer_active) = false;
           id(sleep_sequence_active) = true;
-          id(scheduled_wake_active) = false;
+          id(sleep_sequence_start_time) = millis();
           id(last_m1_value) = id(moisture_1).state;
           id(last_m2_value) = id(moisture_2).state;
           id(last_m3_value) = id(moisture_3).state;
           ESP_LOGI("sleep", "Manual sleep - saved M1=%.3f, M2=%.3f, M3=%.3f", id(last_m1_value), id(last_m2_value), id(last_m3_value));
       - output.turn_off: sensor_enable_pin
       - output.turn_off: aht20_enable_pin
-      - output.turn_off: led_enable_pin
+      # Turn off LED and mark device asleep before the delay so states propagate to HA
       - lambda: |-
+          id(device_awake) = false;
           auto call = id(status_led).turn_off();
           call.set_brightness(0.0f);
           call.set_rgb(0.0f, 0.0f, 0.0f);
           call.perform();
-      - delay: 1s
+          id(led_enable_pin).turn_off();
+      - delay: 5s
       - logger.log: "*** MANUAL SLEEP: GOING TO SLEEP NOW ***"
       - lambda: |-
           // Final Wi-Fi guard just before sleep
           if (!id(wifi_sta_connected)) {
             ESP_LOGW("wifi_gate", "Wi-Fi lost before manual sleep begin; canceling sleep");
             id(sleep_sequence_active) = false;
+            id(device_awake) = true;
+            id(led_enable_pin).turn_on();
+            auto call2 = id(status_led).turn_on();
+            call2.set_brightness(0.3f);
+            call2.set_rgb(0.0f, 1.0f, 0.0f);
+            call2.perform();
             return;
           }
 
-          auto nowt = id(homeassistant_time).now();
-          int mins_to_next_wake = -1;
-          if (nowt.is_valid()) {
-            int cur = nowt.hour * 60 + nowt.minute;
-            auto next_delta = [&](int wake_m) -> int {
-              if (wake_m < 0) return -1;
-              int d = wake_m - cur;
-              if (d < 0) d += 1440;
-              return d;
-            };
-            int deltas[4] = {
-              next_delta(id(wake_time_1_minutes)),
-              next_delta(id(wake_time_2_minutes)),
-              next_delta(id(wake_time_3_minutes)),
-              next_delta(id(wake_time_4_minutes))
-            };
-            for (int i = 0; i < 4; i++) {
-              if (deltas[i] >= 0) {
-                if (mins_to_next_wake < 0 || deltas[i] < mins_to_next_wake) mins_to_next_wake = deltas[i];
-              }
-            }
-          }
-
-          int configured_sleep_min = id(sleep_duration_minutes);
-          int effective_sleep_min = configured_sleep_min;
-          if (mins_to_next_wake >= 0 && mins_to_next_wake < effective_sleep_min) {
-            effective_sleep_min = (mins_to_next_wake < 1) ? 1 : mins_to_next_wake;
-            ESP_LOGI("sleep", "Manual sleep clipped to %d min to hit next wake", effective_sleep_min);
-          }
-
-          uint32_t sleep_time_ms = (uint32_t)effective_sleep_min * 60u * 1000u;
-          ESP_LOGI("sleep", "Manual sleep for %d minutes (configured=%d)", effective_sleep_min, configured_sleep_min);
-          id(device_awake) = false;
+          uint32_t sleep_time_ms = (uint32_t)id(sleep_duration_minutes) * 60u * 1000u;
+          ESP_LOGI("sleep", "Manual sleep for %d minutes", id(sleep_duration_minutes));
           id(deep_sleep_component).set_sleep_duration(sleep_time_ms);
           id(deep_sleep_component).begin_sleep();
 
