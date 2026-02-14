@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '**.yaml'
+      - 'firmware/**'
 
 concurrency:
   group: build-firmware
@@ -28,10 +29,40 @@ jobs:
       - name: Build firmware
         uses: esphome/build-action@v7
         id: esphome-build
+        continue-on-error: true
         with:
           yaml-file: ${{ matrix.device.file }}
 
+      - name: Save build log on failure
+        if: steps.esphome-build.outcome == 'failure'
+        run: |
+          echo "BUILD FAILED for ${{ matrix.device.file }}" > build-error.log
+          echo "See the 'Build firmware' step output above for full compile errors." >> build-error.log
+
+      - name: Auto-fix with Claude
+        if: steps.esphome-build.outcome == 'failure'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            The ESPHome firmware build FAILED for ${{ matrix.device.file }}.
+
+            Please:
+            1. Read the file ${{ matrix.device.file }} to understand the codebase
+            2. Look at the build errors from the GitHub Actions log
+            3. Fix ONLY the compile errors — do not refactor or change functionality
+            4. Increment the patch version in software_version
+            5. Commit and push the fix so the build re-triggers
+
+            IMPORTANT: Only fix compile/syntax errors. Do not change any logic or features.
+          claude_args: "--max-turns 10"
+
+      - name: Fail the build if firmware compile failed and Claude couldn't fix
+        if: steps.esphome-build.outcome == 'failure'
+        run: exit 1
+
       - name: Get version from YAML
+        if: steps.esphome-build.outcome == 'success'
         id: version
         run: |
           VERSION=$(grep 'software_version:' ${{ matrix.device.file }} | head -1 | sed 's/.*"\(.*\)"/\1/')
@@ -39,6 +70,7 @@ jobs:
           echo "Firmware version: $VERSION"
 
       - name: Rename firmware files
+        if: steps.esphome-build.outcome == 'success'
         run: |
           mkdir -p output
           mkdir -p firmware
@@ -62,6 +94,7 @@ jobs:
           ls -la firmware/
 
       - name: Commit factory bin to repo
+        if: steps.esphome-build.outcome == 'success'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -76,13 +109,14 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
 
       - name: Upload build artifact
+        if: steps.esphome-build.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.device.name }}-firmware
           path: output/*.bin
 
       - name: Create GitHub Release
-        if: success()
+        if: steps.esphome-build.outcome == 'success'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ matrix.device.name }}-v${{ steps.version.outputs.version }}
