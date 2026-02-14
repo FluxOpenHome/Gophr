@@ -5,7 +5,7 @@
 substitutions:
   name: "gophr"
   friendly_name: "Gophr"
-  software_version: "1.4.0-sim"
+  software_version: "1.4.1-sim"
 
 esphome:
   name: "${name}"
@@ -23,13 +23,10 @@ esphome:
       - lambda: |-
           // Create per-page focus groups for encoder navigation FIRST
           lv_group_t *gm = lv_group_create();
-          lv_group_t *gs = lv_group_create();
-          lv_group_t *gr = lv_group_create();
           lv_group_t *gx = lv_group_create();
           lv_group_t *gn = lv_group_create();
           lv_group_t *gps = lv_group_create();
           lv_group_t *gpp = lv_group_create();
-          lv_group_t *gpd = lv_group_create();
 
           // page_main (S3 top, S2 mid, S1 bottom)
           lv_group_add_obj(gm, id(slider_m3));
@@ -39,21 +36,7 @@ esphome:
           lv_group_add_obj(gm, id(btn_goto_sim));
           lv_group_add_obj(gm, id(btn_sleep_toggle));
 
-          // page_sweep_cfg
-          lv_group_add_obj(gs, id(slider_sweep_t1));
-          lv_group_add_obj(gs, id(slider_sweep_t2));
-          lv_group_add_obj(gs, id(slider_sweep_t3));
-          lv_group_add_obj(gs, id(btn_pick_duration));
-          lv_group_add_obj(gs, id(btn_dir_up));
-          lv_group_add_obj(gs, id(btn_dir_down));
-          lv_group_add_obj(gs, id(btn_start_sweep));
-          lv_group_add_obj(gs, id(btn_back_sweep_cfg));
-
-          // page_sweep_run
-          lv_group_add_obj(gr, id(btn_cancel_sweep));
-
           // page_sim_select
-          lv_group_add_obj(gx, id(btn_mode_sweep));
           lv_group_add_obj(gx, id(btn_mode_rain));
           lv_group_add_obj(gx, id(btn_back_sim_select));
 
@@ -77,23 +60,12 @@ esphome:
           lv_group_add_obj(gpp, id(btn_sel_heavy));
           lv_group_add_obj(gpp, id(btn_sel_downpour));
 
-          // page_pick_duration
-          lv_group_add_obj(gpd, id(btn_sel_30s));
-          lv_group_add_obj(gpd, id(btn_sel_1m));
-          lv_group_add_obj(gpd, id(btn_sel_5m));
-          lv_group_add_obj(gpd, id(btn_sel_15m));
-          lv_group_add_obj(gpd, id(btn_sel_30m));
-          lv_group_add_obj(gpd, id(btn_sel_1h));
-
           // Store group pointers
           id(grp_main) = (void*)gm;
-          id(grp_sweep_cfg) = (void*)gs;
-          id(grp_sweep_run) = (void*)gr;
           id(grp_sim_select) = (void*)gx;
           id(grp_rain) = (void*)gn;
           id(grp_pick_soil) = (void*)gps;
           id(grp_pick_precip) = (void*)gpp;
-          id(grp_pick_duration) = (void*)gpd;
 
           // Find encoder indev and assign initial group
           lv_indev_t *enc = nullptr;
@@ -247,56 +219,6 @@ globals:
     restore_value: no
     initial_value: '50'
 
-  # Sweep targets
-  - id: sweep_target_1
-    type: int
-    restore_value: no
-    initial_value: '80'
-  - id: sweep_target_2
-    type: int
-    restore_value: no
-    initial_value: '80'
-  - id: sweep_target_3
-    type: int
-    restore_value: no
-    initial_value: '80'
-
-  # Sweep start values (captured when sweep begins)
-  - id: sweep_start_1
-    type: int
-    restore_value: no
-    initial_value: '0'
-  - id: sweep_start_2
-    type: int
-    restore_value: no
-    initial_value: '0'
-  - id: sweep_start_3
-    type: int
-    restore_value: no
-    initial_value: '0'
-
-  # Sweep duration in seconds (shared for all 3)
-  - id: sweep_duration_sec
-    type: int
-    restore_value: no
-    initial_value: '60'
-
-  # Sweep direction: true = UP (toward target), false = DOWN (toward 0)
-  - id: sweep_direction_up
-    type: bool
-    restore_value: no
-    initial_value: 'true'
-
-  # Sweep control
-  - id: sweep_active
-    type: bool
-    restore_value: no
-    initial_value: 'false'
-  - id: sweep_start_time
-    type: unsigned long
-    restore_value: no
-    initial_value: '0'
-
   # Rain simulation state
   - id: rain_active
     type: bool
@@ -375,14 +297,6 @@ globals:
     type: void*
     restore_value: no
     initial_value: 'nullptr'
-  - id: grp_sweep_cfg
-    type: void*
-    restore_value: no
-    initial_value: 'nullptr'
-  - id: grp_sweep_run
-    type: void*
-    restore_value: no
-    initial_value: 'nullptr'
   - id: grp_sim_select
     type: void*
     restore_value: no
@@ -396,10 +310,6 @@ globals:
     restore_value: no
     initial_value: 'nullptr'
   - id: grp_pick_precip
-    type: void*
-    restore_value: no
-    initial_value: 'nullptr'
-  - id: grp_pick_duration
     type: void*
     restore_value: no
     initial_value: 'nullptr'
@@ -748,61 +658,14 @@ button:
       - logger.log: "SIM: Calibrate M3 wet (no-op)"
 
 # ──────────────────────────────────────────────
-# Sweep tick + Sleep wake-up timer
+# Rain tick + Sleep wake-up timer
 # ──────────────────────────────────────────────
 
 interval:
-  # Sweep interpolation tick
+  # Rain + sleep tick
   - interval: 2s
     then:
       - lambda: |-
-          // --- Sweep logic ---
-          if (id(sweep_active)) {
-            unsigned long now = millis();
-            float elapsed_s = (float)(now - id(sweep_start_time)) / 1000.0f;
-            float duration = (float)id(sweep_duration_sec);
-            float t = elapsed_s / duration;
-            if (t > 1.0f) t = 1.0f;
-
-            id(sim_moisture_1) = id(sweep_start_1) +
-              (int)((id(sweep_target_1) - id(sweep_start_1)) * t);
-            id(sim_moisture_2) = id(sweep_start_2) +
-              (int)((id(sweep_target_2) - id(sweep_start_2)) * t);
-            id(sim_moisture_3) = id(sweep_start_3) +
-              (int)((id(sweep_target_3) - id(sweep_start_3)) * t);
-
-            // Update LVGL bars
-            lv_bar_set_value(id(bar_sweep_1), id(sim_moisture_1), LV_ANIM_ON);
-            lv_bar_set_value(id(bar_sweep_2), id(sim_moisture_2), LV_ANIM_ON);
-            lv_bar_set_value(id(bar_sweep_3), id(sim_moisture_3), LV_ANIM_ON);
-
-            // Update value labels
-            char buf[8];
-            snprintf(buf, sizeof(buf), "%d%%", id(sim_moisture_1));
-            lv_label_set_text(id(lbl_sweep_val_1), buf);
-            snprintf(buf, sizeof(buf), "%d%%", id(sim_moisture_2));
-            lv_label_set_text(id(lbl_sweep_val_2), buf);
-            snprintf(buf, sizeof(buf), "%d%%", id(sim_moisture_3));
-            lv_label_set_text(id(lbl_sweep_val_3), buf);
-
-            // Update time remaining
-            int remaining = (int)(duration - elapsed_s);
-            if (remaining < 0) remaining = 0;
-            char tbuf[16];
-            snprintf(tbuf, sizeof(tbuf), "%d:%02d left", remaining / 60, remaining % 60);
-            lv_label_set_text(id(lbl_sweep_time), tbuf);
-
-            // Force publish sensor updates
-            id(moisture_1_percent).publish_state(id(sim_moisture_1));
-            id(moisture_2_percent).publish_state(id(sim_moisture_2));
-            id(moisture_3_percent).publish_state(id(sim_moisture_3));
-
-            if (t >= 1.0f) {
-              id(sweep_active) = false;
-              lv_label_set_text(id(lbl_sweep_time), "DONE!");
-            }
-          }
-
           // --- Rain percolation simulation ---
           // Only runs after user explicitly starts rain sim
           if (id(rain_ever_started)) {
@@ -1309,386 +1172,6 @@ lvgl:
                       - lambda: |-
                           lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0x00E676), 0);
 
-    # ──────── PAGE: SWEEP CONFIG ────────
-    - id: page_sweep_cfg
-      bg_color: 0x0D0D0D
-      bg_opa: COVER
-      on_load:
-        then:
-          - lambda: |-
-              if (id(enc_indev) != nullptr)
-                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_sweep_cfg));
-      widgets:
-        - label:
-            text: "SWEEP CFG"
-            text_font: montserrat_12
-            text_color: 0x888888
-            align: TOP_MID
-            y: 18
-
-        # --- S1 Target ---
-        - label:
-            text: "S1"
-            text_font: montserrat_10
-            text_color: 0x888888
-            x: 22
-            y: 38
-        - slider:
-            id: slider_sweep_t1
-            x: 38
-            y: 38
-            width: 140
-            height: 12
-            min_value: 0
-            max_value: 100
-            value: 80
-            bg_color: 0x1A1A1A
-            indicator:
-              bg_color: 0x2979FF
-            knob:
-              bg_color: 0xFFFFFF
-              radius: 6
-            on_value:
-              then:
-                - lambda: 'id(sweep_target_1) = (int)x;'
-                - lvgl.label.update:
-                    id: lbl_st1
-                    text:
-                      format: "%d%%"
-                      args: ['(int)x']
-        - label:
-            id: lbl_st1
-            text: "80%"
-            text_font: montserrat_10
-            text_color: 0xFFFFFF
-            x: 184
-            y: 37
-
-        # --- S2 Target ---
-        - label:
-            text: "S2"
-            text_font: montserrat_10
-            text_color: 0x888888
-            x: 22
-            y: 56
-        - slider:
-            id: slider_sweep_t2
-            x: 38
-            y: 56
-            width: 140
-            height: 12
-            min_value: 0
-            max_value: 100
-            value: 80
-            bg_color: 0x1A1A1A
-            indicator:
-              bg_color: 0x00BFA5
-            knob:
-              bg_color: 0xFFFFFF
-              radius: 6
-            on_value:
-              then:
-                - lambda: 'id(sweep_target_2) = (int)x;'
-                - lvgl.label.update:
-                    id: lbl_st2
-                    text:
-                      format: "%d%%"
-                      args: ['(int)x']
-        - label:
-            id: lbl_st2
-            text: "80%"
-            text_font: montserrat_10
-            text_color: 0xFFFFFF
-            x: 184
-            y: 55
-
-        # --- S3 Target ---
-        - label:
-            text: "S3"
-            text_font: montserrat_10
-            text_color: 0x888888
-            x: 22
-            y: 74
-        - slider:
-            id: slider_sweep_t3
-            x: 38
-            y: 74
-            width: 140
-            height: 12
-            min_value: 0
-            max_value: 100
-            value: 80
-            bg_color: 0x1A1A1A
-            indicator:
-              bg_color: 0xFFAB00
-            knob:
-              bg_color: 0xFFFFFF
-              radius: 6
-            on_value:
-              then:
-                - lambda: 'id(sweep_target_3) = (int)x;'
-                - lvgl.label.update:
-                    id: lbl_st3
-                    text:
-                      format: "%d%%"
-                      args: ['(int)x']
-        - label:
-            id: lbl_st3
-            text: "80%"
-            text_font: montserrat_10
-            text_color: 0xFFFFFF
-            x: 184
-            y: 73
-
-        # --- Duration selector button ---
-        - label:
-            text: "Duration:"
-            text_font: montserrat_10
-            text_color: 0x888888
-            x: 25
-            y: 96
-        - button:
-            id: btn_pick_duration
-            x: 95
-            y: 92
-            width: 80
-            height: 24
-            styles: style_btn_outline
-            widgets:
-              - label:
-                  id: lbl_duration_val
-                  text: "1m"
-                  text_font: montserrat_10
-                  align: CENTER
-                  text_color: 0x00E676
-            on_click:
-              then:
-                - lvgl.page.show:
-                    id: page_pick_duration
-                    animation: NONE
-
-        # --- Direction + Start row ---
-        - button:
-            id: btn_dir_up
-            x: 30
-            y: 140
-            width: 44
-            height: 24
-            styles: style_btn
-            widgets:
-              - label:
-                  text: "UP"
-                  text_font: montserrat_10
-                  align: CENTER
-                  text_color: 0x0D0D0D
-            on_click:
-              then:
-                - lambda: 'id(sweep_direction_up) = true;'
-        - button:
-            id: btn_dir_down
-            x: 80
-            y: 140
-            width: 52
-            height: 24
-            styles: style_btn_outline
-            widgets:
-              - label:
-                  text: "DOWN"
-                  text_font: montserrat_10
-                  align: CENTER
-                  text_color: 0x00E676
-            on_click:
-              then:
-                - lambda: 'id(sweep_direction_up) = false;'
-        - button:
-            id: btn_start_sweep
-            x: 140
-            y: 140
-            width: 72
-            height: 24
-            styles: style_btn
-            widgets:
-              - label:
-                  text: "START>"
-                  text_font: montserrat_10
-                  align: CENTER
-                  text_color: 0x0D0D0D
-            on_click:
-              then:
-                - lambda: |-
-                    if (id(sweep_direction_up)) {
-                      id(sweep_start_1) = id(sim_moisture_1);
-                      id(sweep_start_2) = id(sim_moisture_2);
-                      id(sweep_start_3) = id(sim_moisture_3);
-                    } else {
-                      id(sweep_start_1) = id(sweep_target_1);
-                      id(sweep_start_2) = id(sweep_target_2);
-                      id(sweep_start_3) = id(sweep_target_3);
-                      id(sweep_target_1) = 0;
-                      id(sweep_target_2) = 0;
-                      id(sweep_target_3) = 0;
-                      id(sim_moisture_1) = id(sweep_start_1);
-                      id(sim_moisture_2) = id(sweep_start_2);
-                      id(sim_moisture_3) = id(sweep_start_3);
-                    }
-                    id(sweep_start_time) = millis();
-                    id(sweep_active) = true;
-                    // Cancel rain sim if running
-                    id(rain_active) = false;
-                    id(rain_ever_started) = false;
-                    lv_bar_set_value(id(bar_sweep_1), id(sim_moisture_1), LV_ANIM_OFF);
-                    lv_bar_set_value(id(bar_sweep_2), id(sim_moisture_2), LV_ANIM_OFF);
-                    lv_bar_set_value(id(bar_sweep_3), id(sim_moisture_3), LV_ANIM_OFF);
-                - lvgl.page.show:
-                    id: page_sweep_run
-                    animation: NONE
-
-        # --- Back ---
-        - button:
-            id: btn_back_sweep_cfg
-            align: BOTTOM_MID
-            y: -20
-            width: 80
-            height: 26
-            styles: style_btn_outline
-            widgets:
-              - label:
-                  text: "< BACK"
-                  text_font: montserrat_10
-                  align: CENTER
-                  text_color: 0x00E676
-            on_click:
-              then:
-                - lvgl.page.show:
-                    id: page_sim_select
-                    animation: NONE
-
-    # ──────── PAGE: SWEEP RUNNING ────────
-    - id: page_sweep_run
-      bg_color: 0x0D0D0D
-      bg_opa: COVER
-      on_load:
-        then:
-          - lambda: |-
-              if (id(enc_indev) != nullptr)
-                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_sweep_run));
-      widgets:
-        - label:
-            text: "SWEEPING"
-            text_font: montserrat_12
-            text_color: 0x00E676
-            align: TOP_MID
-            y: 22
-        - label:
-            id: lbl_sweep_time
-            text: "0:00"
-            text_font: montserrat_12
-            text_color: 0xFFFFFF
-            align: TOP_MID
-            y: 38
-
-        # --- S1 bar ---
-        - label:
-            text: "S1"
-            text_font: montserrat_10
-            text_color: 0x888888
-            x: 22
-            y: 58
-        - bar:
-            id: bar_sweep_1
-            x: 38
-            y: 58
-            width: 140
-            height: 12
-            min_value: 0
-            max_value: 100
-            value: 0
-            bg_color: 0x1A1A1A
-            indicator:
-              bg_color: 0x2979FF
-        - label:
-            id: lbl_sweep_val_1
-            text: "0%"
-            text_font: montserrat_10
-            text_color: 0xFFFFFF
-            x: 184
-            y: 57
-
-        # --- S2 bar ---
-        - label:
-            text: "S2"
-            text_font: montserrat_10
-            text_color: 0x888888
-            x: 22
-            y: 78
-        - bar:
-            id: bar_sweep_2
-            x: 38
-            y: 78
-            width: 140
-            height: 12
-            min_value: 0
-            max_value: 100
-            value: 0
-            bg_color: 0x1A1A1A
-            indicator:
-              bg_color: 0x00BFA5
-        - label:
-            id: lbl_sweep_val_2
-            text: "0%"
-            text_font: montserrat_10
-            text_color: 0xFFFFFF
-            x: 184
-            y: 77
-
-        # --- S3 bar ---
-        - label:
-            text: "S3"
-            text_font: montserrat_10
-            text_color: 0x888888
-            x: 22
-            y: 98
-        - bar:
-            id: bar_sweep_3
-            x: 38
-            y: 98
-            width: 140
-            height: 12
-            min_value: 0
-            max_value: 100
-            value: 0
-            bg_color: 0x1A1A1A
-            indicator:
-              bg_color: 0xFFAB00
-        - label:
-            id: lbl_sweep_val_3
-            text: "0%"
-            text_font: montserrat_10
-            text_color: 0xFFFFFF
-            x: 184
-            y: 97
-
-        # --- Cancel button ---
-        - button:
-            id: btn_cancel_sweep
-            align: BOTTOM_MID
-            y: -30
-            width: 100
-            height: 30
-            styles: style_btn_red
-            widgets:
-              - label:
-                  text: "CANCEL"
-                  text_font: montserrat_10
-                  align: CENTER
-                  text_color: 0xFFFFFF
-            on_click:
-              then:
-                - lambda: 'id(sweep_active) = false;'
-                - lvgl.page.show:
-                    id: page_sim_select
-                    animation: NONE
-
     # ──────── PAGE: SIM MODE SELECT ────────
     - id: page_sim_select
       bg_color: 0x0D0D0D
@@ -1707,28 +1190,9 @@ lvgl:
             y: 28
 
         - button:
-            id: btn_mode_sweep
-            align: CENTER
-            y: -20
-            width: 170
-            height: 40
-            styles: style_btn_outline
-            widgets:
-              - label:
-                  text: "SWEEP"
-                  text_font: montserrat_14
-                  align: CENTER
-                  text_color: 0x00E676
-            on_click:
-              then:
-                - lvgl.page.show:
-                    id: page_sweep_cfg
-                    animation: NONE
-
-        - button:
             id: btn_mode_rain
             align: CENTER
-            y: 30
+            y: -10
             width: 170
             height: 40
             styles: style_btn
@@ -2002,8 +1466,6 @@ lvgl:
                 - lambda: |-
                     id(rain_active) = true;
                     id(rain_ever_started) = true;
-                    // Cancel sweep if running
-                    id(sweep_active) = false;
                     id(sim_moisture_f1) = (float)id(sim_moisture_1);
                     id(sim_moisture_f2) = (float)id(sim_moisture_2);
                     id(sim_moisture_f3) = (float)id(sim_moisture_3);
@@ -2245,151 +1707,3 @@ lvgl:
                     id: page_rain
                     animation: NONE
 
-    # ──────── PAGE: PICK DURATION ────────
-    - id: page_pick_duration
-      bg_color: 0x0D0D0D
-      bg_opa: COVER
-      on_load:
-        then:
-          - lambda: |-
-              if (id(enc_indev) != nullptr)
-                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_pick_duration));
-      widgets:
-        - label:
-            text: "SWEEP DURATION"
-            text_font: montserrat_14
-            text_color: 0x888888
-            align: TOP_MID
-            y: 24
-        - button:
-            id: btn_sel_30s
-            x: 30
-            y: 50
-            width: 80
-            height: 28
-            styles: style_btn
-            widgets:
-              - label:
-                  text: "30 sec"
-                  text_font: montserrat_12
-                  align: CENTER
-                  text_color: 0x0D0D0D
-            on_click:
-              then:
-                - lambda: 'id(sweep_duration_sec) = 30;'
-                - lvgl.label.update:
-                    id: lbl_duration_val
-                    text: "30s"
-                - lvgl.page.show:
-                    id: page_sweep_cfg
-                    animation: NONE
-        - button:
-            id: btn_sel_1m
-            x: 130
-            y: 50
-            width: 80
-            height: 28
-            styles: style_btn
-            widgets:
-              - label:
-                  text: "1 min"
-                  text_font: montserrat_12
-                  align: CENTER
-                  text_color: 0x0D0D0D
-            on_click:
-              then:
-                - lambda: 'id(sweep_duration_sec) = 60;'
-                - lvgl.label.update:
-                    id: lbl_duration_val
-                    text: "1m"
-                - lvgl.page.show:
-                    id: page_sweep_cfg
-                    animation: NONE
-        - button:
-            id: btn_sel_5m
-            x: 30
-            y: 86
-            width: 80
-            height: 28
-            styles: style_btn
-            widgets:
-              - label:
-                  text: "5 min"
-                  text_font: montserrat_12
-                  align: CENTER
-                  text_color: 0x0D0D0D
-            on_click:
-              then:
-                - lambda: 'id(sweep_duration_sec) = 300;'
-                - lvgl.label.update:
-                    id: lbl_duration_val
-                    text: "5m"
-                - lvgl.page.show:
-                    id: page_sweep_cfg
-                    animation: NONE
-        - button:
-            id: btn_sel_15m
-            x: 130
-            y: 86
-            width: 80
-            height: 28
-            styles: style_btn
-            widgets:
-              - label:
-                  text: "15 min"
-                  text_font: montserrat_12
-                  align: CENTER
-                  text_color: 0x0D0D0D
-            on_click:
-              then:
-                - lambda: 'id(sweep_duration_sec) = 900;'
-                - lvgl.label.update:
-                    id: lbl_duration_val
-                    text: "15m"
-                - lvgl.page.show:
-                    id: page_sweep_cfg
-                    animation: NONE
-        - button:
-            id: btn_sel_30m
-            x: 30
-            y: 122
-            width: 80
-            height: 28
-            styles: style_btn
-            widgets:
-              - label:
-                  text: "30 min"
-                  text_font: montserrat_12
-                  align: CENTER
-                  text_color: 0x0D0D0D
-            on_click:
-              then:
-                - lambda: 'id(sweep_duration_sec) = 1800;'
-                - lvgl.label.update:
-                    id: lbl_duration_val
-                    text: "30m"
-                - lvgl.page.show:
-                    id: page_sweep_cfg
-                    animation: NONE
-        - button:
-            id: btn_sel_1h
-            x: 130
-            y: 122
-            width: 80
-            height: 28
-            styles: style_btn
-            widgets:
-              - label:
-                  text: "1 hour"
-                  text_font: montserrat_12
-                  align: CENTER
-                  text_color: 0x0D0D0D
-            on_click:
-              then:
-                - lambda: 'id(sweep_duration_sec) = 3600;'
-                - lvgl.label.update:
-                    id: lbl_duration_val
-                    text: "1h"
-                - lvgl.page.show:
-                    id: page_sweep_cfg
-                    animation: NONE
