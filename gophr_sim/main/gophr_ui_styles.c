@@ -9,12 +9,12 @@ void gophr_styles_init(void)
 /* Interpolate between two colors by a fraction (0.0 - 1.0) */
 static lv_color_t color_lerp(lv_color_t c1, lv_color_t c2, float t)
 {
-    uint8_t r1 = lv_color_red(c1);
-    uint8_t g1 = lv_color_green(c1);
-    uint8_t b1 = lv_color_blue(c1);
-    uint8_t r2 = lv_color_red(c2);
-    uint8_t g2 = lv_color_green(c2);
-    uint8_t b2 = lv_color_blue(c2);
+    uint8_t r1 = c1.red;
+    uint8_t g1 = c1.green;
+    uint8_t b1 = c1.blue;
+    uint8_t r2 = c2.red;
+    uint8_t g2 = c2.green;
+    uint8_t b2 = c2.blue;
 
     uint8_t r = (uint8_t)(r1 + (r2 - r1) * t);
     uint8_t g = (uint8_t)(g1 + (g2 - g1) * t);

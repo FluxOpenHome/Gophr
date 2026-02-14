@@ -98,7 +98,7 @@ static lv_obj_t *wifi_pass_ssid_label = NULL;
 static lv_obj_t *wifi_pass_input_label = NULL;
 static lv_obj_t *wifi_pass_char_label = NULL;
 static lv_obj_t *wifi_pass_hint_label = NULL;
-static lv_obj_t *wifi_pass_cursor_line = NULL;
+/* wifi_pass_cursor_line removed - not needed */
 
 /* Wi-Fi connecting */
 static lv_obj_t *scr_wifi_connecting = NULL;
@@ -1294,13 +1294,19 @@ static uint32_t s_state_timer = 0;
 static bool s_btn_was_pressed = false;
 static int s_btn_hold_count = 0; /* Track how long button held */
 
-/* Debounced button press detection (returns true once per press) */
-static bool button_pressed(lv_indev_t *enc_indev)
-{
-    lv_indev_data_t data;
-    lv_indev_read(enc_indev, &data);
+/* Read encoder hardware directly (button on GPIO42, encoder via PCNT) */
+#include "driver/gpio.h"
+#include "driver/pulse_cnt.h"
 
-    bool pressed = (data.state == LV_INDEV_STATE_PRESSED);
+extern pcnt_unit_handle_t s_pcnt_unit; /* from gophr_encoder.c */
+#define UI_BUTTON_PIN 42
+
+static int s_ui_last_count = 0;
+
+/* Debounced button press detection (returns true once per press) */
+static bool button_pressed(void)
+{
+    bool pressed = (gpio_get_level(UI_BUTTON_PIN) == 0);
     bool edge = pressed && !s_btn_was_pressed;
 
     if (pressed) {
@@ -1319,29 +1325,20 @@ static bool button_held(int ticks)
     return s_btn_hold_count >= ticks;
 }
 
-/* Check for button release (returns true once on release) */
-static bool button_released(void)
-{
-    /* A "short press" is when the button was pressed and released
-       without being held long enough for a hold action */
-    return !s_btn_was_pressed && s_btn_hold_count == 0;
-}
-
 /* Get encoder rotation delta */
-static int encoder_delta(lv_indev_t *enc_indev)
+static int encoder_delta(void)
 {
-    lv_indev_data_t data;
-    lv_indev_read(enc_indev, &data);
-    return data.enc_diff;
+    int count = 0;
+    pcnt_unit_get_count(s_pcnt_unit, &count);
+    int diff = count - s_ui_last_count;
+    s_ui_last_count = count;
+    return diff;
 }
 
 void gophr_ui_run(void)
 {
-    lv_indev_t *enc = gophr_encoder_get_indev();
-    if (!enc) return;
-
-    bool btn = button_pressed(enc);
-    int delta = encoder_delta(enc);
+    bool btn = button_pressed();
+    int delta = encoder_delta();
     bool held = button_held(25); /* ~500ms hold */
 
     /* Update status indicators */

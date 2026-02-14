@@ -17,7 +17,7 @@ static const char *TAG = "gophr_encoder";
 #define PCNT_HIGH_LIMIT  1000
 #define PCNT_LOW_LIMIT  -1000
 
-static pcnt_unit_handle_t s_pcnt_unit = NULL;
+pcnt_unit_handle_t s_pcnt_unit = NULL; /* non-static: accessed by gophr_ui.c */
 static lv_indev_t *s_encoder_indev = NULL;
 static int s_last_count = 0;
 

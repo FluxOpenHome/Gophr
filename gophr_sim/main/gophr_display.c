@@ -7,6 +7,7 @@
 #include "driver/spi_master.h"
 #include "driver/ledc.h"
 #include "driver/gpio.h"
+#include "esp_heap_caps.h"
 
 static const char *TAG = "gophr_display";
 
@@ -25,8 +26,8 @@ static const char *TAG = "gophr_display";
 #define LCD_CMD_BITS    8
 #define LCD_PARAM_BITS  8
 
-/* LVGL draw buffer: 40 lines at a time */
-#define LVGL_BUF_LINES  40
+/* LVGL draw buffer: 20 lines at a time (no PSRAM, must fit in internal RAM) */
+#define LVGL_BUF_LINES  20
 #define LVGL_BUF_SIZE   (LCD_H_RES * LVGL_BUF_LINES * sizeof(lv_color16_t))
 
 /* Backlight LEDC config */
@@ -37,14 +38,40 @@ static const char *TAG = "gophr_display";
 static lv_display_t *s_display = NULL;
 static esp_lcd_panel_handle_t s_panel = NULL;
 
-/* LVGL flush callback */
+/* Called by esp_lcd when DMA transfer is complete (ISR context).
+ * This is the correct way to signal LVGL that the flush buffer is free. */
+static bool notify_lvgl_flush_ready(esp_lcd_panel_io_handle_t panel_io,
+                                     esp_lcd_panel_io_event_data_t *edata,
+                                     void *user_ctx)
+{
+    lv_display_t *disp = (lv_display_t *)user_ctx;
+    lv_display_flush_ready(disp);
+    return false;
+}
+
+/* Swap bytes in RGB565 pixel data for SPI byte order.
+ * SPI sends MSB first; LVGL stores RGB565 as native little-endian
+ * but the GC9A01 expects big-endian (MSB first), so we swap each 2-byte pixel. */
+static void swap_bytes_rgb565(uint8_t *buf, size_t len_bytes)
+{
+    uint16_t *px = (uint16_t *)buf;
+    size_t count = len_bytes / 2;
+    for (size_t i = 0; i < count; i++) {
+        px[i] = (px[i] >> 8) | (px[i] << 8);
+    }
+}
+
 static void lvgl_flush_cb(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
 {
+    int w = area->x2 - area->x1 + 1;
+    int h = area->y2 - area->y1 + 1;
+    swap_bytes_rgb565(px_map, w * h * 2);
+
     esp_lcd_panel_draw_bitmap(s_panel,
         area->x1, area->y1,
         area->x2 + 1, area->y2 + 1,
         px_map);
-    lv_display_flush_ready(disp);
+    /* flush_ready is called by notify_lvgl_flush_ready when DMA completes */
 }
 
 esp_err_t gophr_display_init(void)
@@ -72,6 +99,8 @@ esp_err_t gophr_display_init(void)
         .lcd_param_bits = LCD_PARAM_BITS,
         .spi_mode = 0,
         .trans_queue_depth = 10,
+        .on_color_trans_done = notify_lvgl_flush_ready,
+        .user_ctx = NULL, /* will be set after display is created */
     };
     ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(LCD_SPI_HOST, &io_cfg, &io_handle));
 
@@ -87,6 +116,7 @@ esp_err_t gophr_display_init(void)
     ESP_ERROR_CHECK(esp_lcd_panel_reset(s_panel));
     ESP_ERROR_CHECK(esp_lcd_panel_init(s_panel));
     ESP_ERROR_CHECK(esp_lcd_panel_invert_color(s_panel, true));
+    ESP_ERROR_CHECK(esp_lcd_panel_mirror(s_panel, true, false)); /* Fix horizontal mirroring */
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(s_panel, true));
 
     /* Initialize backlight via LEDC PWM */
@@ -118,20 +148,28 @@ esp_err_t gophr_display_init(void)
 
     /* Create LVGL display */
     s_display = lv_display_create(LCD_H_RES, LCD_V_RES);
+    lv_display_set_color_format(s_display, LV_COLOR_FORMAT_RGB565);
     lv_display_set_flush_cb(s_display, lvgl_flush_cb);
 
-    /* Allocate draw buffers */
+    /* Now set the user_ctx so the DMA callback can find the display.
+     * We need to update the IO handle's user_ctx via the callback struct. */
+    const esp_lcd_panel_io_callbacks_t cbs = {
+        .on_color_trans_done = notify_lvgl_flush_ready,
+    };
+    esp_lcd_panel_io_register_event_callbacks(io_handle, &cbs, s_display);
+
+    /* Allocate draw buffers from internal DMA-capable RAM */
     static uint8_t *buf1 = NULL;
     static uint8_t *buf2 = NULL;
     buf1 = heap_caps_malloc(LVGL_BUF_SIZE, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
     buf2 = heap_caps_malloc(LVGL_BUF_SIZE, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
     if (!buf1 || !buf2) {
-        ESP_LOGE(TAG, "Failed to allocate LVGL draw buffers");
+        ESP_LOGE(TAG, "Failed to allocate LVGL draw buffers (%u bytes each)", (unsigned)LVGL_BUF_SIZE);
         return ESP_ERR_NO_MEM;
     }
     lv_display_set_buffers(s_display, buf1, buf2, LVGL_BUF_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
-    ESP_LOGI(TAG, "Display initialized: %dx%d", LCD_H_RES, LCD_V_RES);
+    ESP_LOGI(TAG, "Display initialized: %dx%d, buf=%u bytes x2", LCD_H_RES, LCD_V_RES, (unsigned)LVGL_BUF_SIZE);
     return ESP_OK;
 }
 

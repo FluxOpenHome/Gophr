@@ -4,6 +4,8 @@
 #include "esp_lcd_touch_ft5x06.h"
 #include "driver/i2c_master.h"
 #include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "lvgl.h"
 
 static const char *TAG = "gophr_touch";
@@ -13,19 +15,26 @@ static const char *TAG = "gophr_touch";
 #define TOUCH_I2C_SCL   12
 #define TOUCH_I2C_ADDR  0x38
 #define TOUCH_INT_PIN   14
-#define TOUCH_I2C_FREQ  400000
+#define TOUCH_I2C_FREQ  100000  /* M5Dial has no external I2C pull-ups; 400kHz NACKs */
 
 static esp_lcd_touch_handle_t s_touch = NULL;
 static lv_indev_t *s_touch_indev = NULL;
 
-/* LVGL touch read callback */
+/* LVGL touch read callback — suppress I2C error log spam */
 static void lvgl_touch_read_cb(lv_indev_t *indev, lv_indev_data_t *data)
 {
     uint16_t x[1], y[1];
     uint16_t strength[1];
     uint8_t count = 0;
 
+    /* Temporarily suppress I2C error logs during touch polling */
+    esp_log_level_t old_level = esp_log_level_get("i2c.master");
+    esp_log_level_set("i2c.master", ESP_LOG_NONE);
+
     esp_lcd_touch_read_data(s_touch);
+
+    esp_log_level_set("i2c.master", old_level);
+
     bool pressed = esp_lcd_touch_get_coordinates(s_touch, x, y, strength, &count, 1);
 
     if (pressed && count > 0) {
@@ -52,6 +61,9 @@ esp_err_t gophr_touch_init(void)
     };
     i2c_master_bus_handle_t i2c_bus = NULL;
     ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_bus_cfg, &i2c_bus));
+
+    /* FT3267 needs time after power-on before it responds to I2C */
+    vTaskDelay(pdMS_TO_TICKS(300));
 
     /* Create touch panel handle */
     esp_lcd_panel_io_handle_t tp_io_handle = NULL;
