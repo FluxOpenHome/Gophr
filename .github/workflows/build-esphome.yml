@@ -6,6 +6,10 @@ on:
     paths:
       - '**.yaml'
 
+concurrency:
+  group: build-firmware
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build ${{ matrix.device.name }}
