@@ -1,0 +1,85 @@
+name: Build ESPHome Firmware
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.yaml'
+
+jobs:
+  build:
+    name: Build ${{ matrix.device.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        device:
+          - name: gophr-sim
+            file: gophr_sim_cores3.yaml
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build firmware
+        uses: esphome/build-action@v7
+        id: esphome-build
+        with:
+          yaml-file: ${{ matrix.device.file }}
+
+      - name: Get version from YAML
+        id: version
+        run: |
+          VERSION=$(grep 'software_version:' ${{ matrix.device.file }} | head -1 | sed 's/.*"\(.*\)"/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Firmware version: $VERSION"
+
+      - name: Rename firmware files
+        run: |
+          mkdir -p output
+          BUILD_DIR="${{ steps.esphome-build.outputs.name }}"
+          VERSION="${{ steps.version.outputs.version }}"
+          NAME="${{ matrix.device.name }}"
+
+          # Find and rename factory bin
+          for file in "$BUILD_DIR"/*.factory.bin; do
+            [ -f "$file" ] && cp "$file" "output/${NAME}-${VERSION}.factory.bin"
+          done
+
+          # Find and rename OTA bin
+          for file in "$BUILD_DIR"/*.ota.bin; do
+            [ -f "$file" ] && cp "$file" "output/${NAME}-${VERSION}.ota.bin"
+          done
+
+          # Fallback: if no .factory/.ota naming, grab whatever .bin exists
+          if [ ! "$(ls output/*.bin 2>/dev/null)" ]; then
+            cp "$BUILD_DIR"/*.bin output/ 2>/dev/null || true
+          fi
+
+          echo "Output files:"
+          ls -la output/
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.device.name }}-firmware
+          path: output/*.bin
+
+      - name: Create GitHub Release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ matrix.device.name }}-v${{ steps.version.outputs.version }}
+          name: "${{ matrix.device.name }} v${{ steps.version.outputs.version }}"
+          body: |
+            Automated firmware build for **${{ matrix.device.name }}**
+
+            - Version: `${{ steps.version.outputs.version }}`
+            - Commit: ${{ github.sha }}
+            - Built: ${{ github.event.head_commit.timestamp }}
+
+            **Files:**
+            - `.factory.bin` — Full flash (USB / ESPHome Web)
+            - `.ota.bin` — OTA update
+          files: output/*.bin
+          make_latest: true
