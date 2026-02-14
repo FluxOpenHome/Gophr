@@ -36,19 +36,18 @@ esphome:
 
 esp32:
   board: esp32-s3-devkitc-1
-  flash_size: 16MB
+  flash_size: 8MB
   framework:
     type: esp-idf
     sdkconfig_options:
-      CONFIG_ESP32S3_DATA_CACHE_64KB: "y"
-      CONFIG_ESP32S3_DATA_CACHE_LINE_64B: "y"
       CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
-      CONFIG_SPIRAM_RODATA: "y"
-      CONFIG_SPIRAM_FETCH_INSTRUCTIONS: "y"
 
-psram:
-  mode: quad
-  speed: 80MHz
+# NOTE: Uncomment psram section below if using CoreS3 (not SE) with PSRAM
+# Also add these sdkconfig_options: CONFIG_ESP32S3_DATA_CACHE_64KB,
+# CONFIG_ESP32S3_DATA_CACHE_LINE_64B, CONFIG_SPIRAM_RODATA, CONFIG_SPIRAM_FETCH_INSTRUCTIONS
+# psram:
+#   mode: octal
+#   speed: 80MHz
 
 logger:
   level: DEBUG
@@ -831,7 +830,7 @@ lvgl:
   touchscreens:
     - touchscreen_id: touch
   color_depth: 16
-  buffer_size: 25%
+  buffer_size: 10%
   default_font: montserrat_14
   disp_bg_color: 0x0D0D0D
 
