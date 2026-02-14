@@ -110,6 +110,7 @@ display:
     reset_pin: GPIO8
     dc_pin: GPIO4
     id: dial_lcd
+    invert_colors: true
     auto_clear_enabled: false
     update_interval: never
 
