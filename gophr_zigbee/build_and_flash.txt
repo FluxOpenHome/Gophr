@@ -1,0 +1,4 @@
+cd gophr_zigbee
+idf.py set-target esp32c6
+idf.py build
+idf.py -p /dev/ttyUSB0 erase-flash flash monitor

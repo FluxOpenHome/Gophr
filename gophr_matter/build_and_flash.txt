@@ -1,0 +1,5 @@
+cd gophr_matter
+export ESP_MATTER_PATH=/path/to/your/esp-matter
+idf.py set-target esp32c6
+idf.py build
+idf.py -p /dev/ttyUSB0 erase-flash flash monitor

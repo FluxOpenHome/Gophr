@@ -1,0 +1,336 @@
+timestamp,actor,category,description
+2026-02-11T06:58:36.725424+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Sunday: off -> on
+2026-02-11T06:58:31.483867+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Sunday: on -> off
+2026-02-11T06:58:09.564081+00:00,Management,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_5
+2026-02-11T06:57:52.270817+00:00,Management,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-11T06:56:33.504816+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-11T06:56:24.003581+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 3
+2026-02-11T06:52:48.771356+00:00,Management,Issues,Acknowledged issue (severe): This is from the AWS side. Can you see me?
+2026-02-11T04:36:23.017549+00:00,Management,Moisture Probes,Queued sleep disable for Gophr 2ac860 (FluxOpenHome Gophr) (pending wake)
+2026-02-11T04:35:54.119987+00:00,Management,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-11T04:22:40.067346+00:00,Management,Schedule,Set 793A8C Schedule Start Time 1: 5:00 AM -> 1:00 AM
+2026-02-11T04:21:59.296085+00:00,Management,Moisture Probes,Queued sleep disable for Gophr 2ac860 (FluxOpenHome Gophr) (pending wake)
+2026-02-11T02:46:57.468977+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 5.0 min (pending wake)
+2026-02-11T02:33:49.438353+00:00,Management,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-11T02:33:05.769891+00:00,Management,Moisture Probes,Calibrate wet pressed for Gophr 2ac860 (FluxOpenHome Gophr) (3 sensors)
+2026-02-11T02:32:05.176854+00:00,Management,Moisture Probes,Calibrate dry pressed for Gophr 2ac860 (FluxOpenHome Gophr) (3 sensors)
+2026-02-11T02:31:39.205222+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 2
+2026-02-11T02:10:40.860989+00:00,Management,Moisture Probes,Queued sleep disable for Gophr 2ac860 (FluxOpenHome Gophr) (pending wake)
+2026-02-11T01:20:43.642082+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 5.0 min (pending wake)
+2026-02-11T01:18:38.321003+00:00,Management,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-11T01:17:14.263346+00:00,Management,Moisture Probes,Queued sleep disable for Gophr 2ac860 (FluxOpenHome Gophr) (pending wake)
+2026-02-11T00:31:49.451101+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Zone 8 Mode: Master Valve -> Pump Start Relay
+2026-02-11T00:29:19.509571+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 2
+2026-02-11T00:29:12.277824+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Zone 8 Mode: Pump Start Relay -> Master Valve
+2026-02-11T00:13:32.826000+00:00,Homeowner,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 2
+2026-02-11T00:12:37.049163+00:00,Homeowner,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 1
+2026-02-11T00:12:19.375050+00:00,Homeowner,Moisture Probes,Apply Factors to Schedule: Disabled -> Enabled
+2026-02-11T00:11:34.857126+00:00,Homeowner,Moisture Probes,Apply Factors to Schedule: Enabled -> Disabled
+2026-02-11T00:10:43.009829+00:00,Homeowner,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_6
+2026-02-11T00:08:33.745095+00:00,Homeowner,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-11T00:07:54.112771+00:00,Homeowner,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 1 (6 head(s))
+2026-02-11T00:07:13.249516+00:00,Homeowner,Schedule,Updated zone aliases (no changes)
+2026-02-11T00:07:09.584028+00:00,Homeowner,Schedule,Zone alias Irrigation Ctrl V2 793A8C Zone 1: (default) -> Zone 1
+2026-02-11T00:06:00.378218+00:00,Homeowner,Moisture Probes,Updated probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-10T23:34:59.469243+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-10T23:26:42.028717+00:00,Homeowner,Issues,Returned issue (severe): The sprinkler next to my mailbox is spraying water all over!!
+2026-02-10T23:25:53.571593+00:00,Management,Issues,Resolved issue (severe): The sprinkler next to my mailbox is spraying water all over!!
+2026-02-10T23:19:12.407314+00:00,Homeowner,Issues,Reported Severe Issue: The sprinkler next to my mailbox is spraying water all over!!
+2026-02-10T22:55:57.643113+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 7
+2026-02-10T22:55:51.813167+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 7
+2026-02-10T22:11:13.028831+00:00,Homeowner,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 6
+2026-02-10T22:10:47.088996+00:00,Homeowner,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 6
+2026-02-10T22:09:33.497722+00:00,Homeowner,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 5
+2026-02-10T22:09:17.222018+00:00,Homeowner,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 5
+2026-02-10T22:09:03.104013+00:00,Homeowner,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 5 (50 head(s))
+2026-02-10T22:03:04.331211+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Zone 8 Mode: Zone -> Pump Start Relay
+2026-02-10T22:00:37.897810+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Enabled: off -> on
+2026-02-10T22:00:03.265419+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Zone 8 Mode: Pump Start Relay -> Zone
+2026-02-10T21:59:43.698933+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 1
+2026-02-10T21:59:27.482998+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-10T21:57:32.809837+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 4 (1 head(s))
+2026-02-10T21:57:24.872526+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 4 (1 head(s))
+2026-02-10T21:46:25.396496+00:00,Management,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — Removed zones: switch.irrigation_ctrl_v2_793a8c_zone_11, switch.irrigation_ctrl_v2_793a8c_zone_12"
+2026-02-10T21:44:52.746966+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 1 (5 head(s))
+2026-02-10T17:44:44.867601+00:00,Management,Weather Rules,"Wind Speed — Max Wind (km/h): 14 -> 24, Max Wind (mph): 8 -> 15"
+2026-02-10T16:10:04.664717+00:00,Homeowner,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 2 (4 head(s))
+2026-02-10T15:37:16.880106+00:00,Homeowner,Issues,Reported Clarification: Is it normal for the irrigation to come on late at night?
+2026-02-10T02:59:57.245073+00:00,Management,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_12
+2026-02-10T02:59:20.177630+00:00,Management,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_11
+2026-02-09T23:43:59.754045+00:00,Management,Report Settings,Company Name: (empty) → HOT VIBES IRRIGATION; Accent Color: #1a7a4c → #d50b0b
+2026-02-09T23:10:05.679117+00:00,Homeowner,Water Settings,water_source:  → well
+2026-02-09T22:39:53.270006+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 1
+2026-02-09T22:39:35.336592+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-09T21:40:28.275399+00:00,Management,Pump Settings,hp: 0.0 → 2.0; kw: 0.0 → 1.4914; brand:  → Goulds; year_installed:  → 2020; cost_per_kwh: 0.12 → 0.14
+2026-02-09T21:39:57.878633+00:00,Management,Pump Settings,voltage: 240 → 240.0
+2026-02-09T20:33:48.642000+00:00,Management,Weather Rules,Seasonal Adjustment — Disabled
+2026-02-09T20:21:42.603318+00:00,Management,Weather Rules,"Wind Speed — Max Wind (km/h): 2 -> 14, Max Wind (mph): 1 -> 8"
+2026-02-09T20:21:25.645400+00:00,Management,Weather Rules,"Wind Speed — Max Wind (km/h): 14 -> 2, Max Wind (mph): 8 -> 1"
+2026-02-09T20:21:10.032521+00:00,Management,Weather Rules,"Cool Temperature — Cool Threshold (C): 27 -> 10, Cool Threshold (F): 80 -> 50"
+2026-02-09T20:20:48.951717+00:00,Management,Weather Rules,"Cool Temperature — Cool Threshold (C): 10 -> 27, Cool Threshold (F): 50 -> 80"
+2026-02-09T20:20:40.555566+00:00,Management,Weather Rules,"Freeze Protection — Freeze Threshold (C): 32 -> 2, Freeze Threshold (F): 90 -> 35"
+2026-02-09T20:20:13.296253+00:00,Management,Weather Rules,"Freeze Protection — Freeze Threshold (C): 2 -> 32, Freeze Threshold (F): 35 -> 90"
+2026-02-09T20:11:29.875988+00:00,Management,Weather Rules,Seasonal Adjustment — Enabled
+2026-02-09T20:11:06.407628+00:00,Management,Weather Rules,"Hot Temperature — Hot Threshold (C): -7 -> 35, Hot Threshold (F): 20 -> 95"
+2026-02-09T20:10:40.948003+00:00,Management,Weather Rules,"Hot Temperature — Hot Threshold (C): 35 -> -7, Hot Threshold (F): 95 -> 20"
+2026-02-09T20:01:42.194962+00:00,Management,Weather Rules,"Wind Speed — Max Wind (km/h): 2 -> 14, Max Wind (mph): 1 -> 8"
+2026-02-09T20:01:06.605990+00:00,Management,Weather Rules,"Wind Speed — Max Wind (km/h): 32 -> 2, Max Wind (mph): 20 -> 1"
+2026-02-09T20:00:44.998700+00:00,Management,Weather Rules,"Humidity — Enabled, Humidity Threshold (%): 10 -> 80"
+2026-02-09T20:00:28.843350+00:00,Management,Weather Rules,Humidity — Disabled
+2026-02-09T19:59:04.369739+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 2
+2026-02-09T19:53:55.430087+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 2 for 10 min
+2026-02-09T19:53:46.493718+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 8
+2026-02-09T19:39:54.712603+00:00,Management,Weather Rules,Humidity — Humidity Threshold (%): 80 -> 10
+2026-02-09T19:35:28.998236+00:00,Management,Schedule,Set 793A8C Rain Delay Enabled: on -> off
+2026-02-09T19:35:02.840277+00:00,Management,Schedule,Set 793A8C Rain Delay Enabled: off -> on
+2026-02-09T19:34:44.422641+00:00,Management,Schedule,Set 793A8C Rain Delay Enabled: on -> off
+2026-02-09T19:34:39.759569+00:00,Management,Schedule,Set 793A8C Rain Delay Enabled: off -> on
+2026-02-09T19:18:50.747192+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 3 (1 head(s))
+2026-02-09T19:18:18.418433+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 2 (4 head(s))
+2026-02-09T19:06:47.463845+00:00,Homeowner,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 2 (4 head(s))
+2026-02-09T19:00:45.531221+00:00,Management,Moisture Probes,Set sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 60.0 min (applied immediately)
+2026-02-09T17:46:49.122005+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 2 (4 head(s))
+2026-02-09T17:40:52.516220+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 2 (4 head(s))
+2026-02-09T17:39:12.729067+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 2 (4 head(s))
+2026-02-09T17:36:09.800469+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 2 (4 head(s))
+2026-02-09T17:36:06.084492+00:00,Management,Zone Details,Updated head details for Irrigation Ctrl V2 793A8C Zone 2 (4 head(s))
+2026-02-09T17:15:59.111314+00:00,Management,Weather Rules,"Cool Temperature — Cool Threshold (C): 18 -> 10, Cool Threshold (F): 65 -> 50"
+2026-02-09T17:14:06.985607+00:00,Management,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T16:41:30.282739+00:00,Management,Schedule,Set 793A8C Schedule Start Time 2: 10:00 AM -> 
+2026-02-09T16:39:30.273719+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Enabled: off -> on
+2026-02-09T16:39:09.652667+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Enabled: on -> off
+2026-02-09T16:37:14.860336+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1 for 1 min
+2026-02-09T16:36:15.278578+00:00,Management,Moisture Probes,Queued sleep disable for Gophr 2ac860 (FluxOpenHome Gophr) (pending wake)
+2026-02-09T16:31:25.280297+00:00,Homeowner,Issues,Dismissed resolved issue (severe): MY PUMP EXPLODED...
+2026-02-09T16:30:29.293830+00:00,Management,Issues,Resolved issue (severe): MY PUMP EXPLODED...
+2026-02-09T16:23:17.301719+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 10.0 min (pending wake)
+2026-02-09T16:22:32.995881+00:00,Management,Moisture Probes,Updated probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T16:21:56.247578+00:00,Management,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T16:20:55.163248+00:00,Homeowner,Moisture Probes,Sleep disabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T16:20:14.205906+00:00,Homeowner,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 1.0 min (pending wake)
+2026-02-09T16:05:49.312435+00:00,Management,Weather Rules,Cool Temperature — Enabled
+2026-02-09T16:05:27.907312+00:00,Management,Weather Rules,Cool Temperature — Disabled
+2026-02-09T16:05:13.190106+00:00,Management,Weather Rules,Cool Temperature — Enabled
+2026-02-09T16:05:00.938966+00:00,Management,Weather Rules,Cool Temperature — Disabled
+2026-02-09T15:51:44.432586+00:00,Homeowner,Schedule,Set 793A8C Rain Sensor Enabled: on -> off
+2026-02-09T15:51:42.934396+00:00,Homeowner,Schedule,Set 793A8C Rain Delay Enabled: on -> off
+2026-02-09T15:51:06.810457+00:00,Homeowner,Schedule,Set 793A8C Rain Sensor Enabled: off -> on
+2026-02-09T15:51:02.522280+00:00,Homeowner,Schedule,Set 793A8C Rain Delay Enabled: off -> on
+2026-02-09T15:40:17.986973+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 60.0 min (pending wake)
+2026-02-09T15:40:05.369088+00:00,Management,Moisture Probes,Queued sleep enable for Gophr 2ac860 (FluxOpenHome Gophr) (pending wake)
+2026-02-09T15:39:43.759303+00:00,Management,Moisture Probes,Queued sleep disable for Gophr 2ac860 (FluxOpenHome Gophr) (pending wake)
+2026-02-09T15:38:11.905664+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 2
+2026-02-09T15:36:10.256476+00:00,Homeowner,Issues,Dismissed resolved issue (clarification): small
+2026-02-09T15:35:53.778089+00:00,Management,Issues,Resolved issue (clarification): small
+2026-02-09T15:35:33.147227+00:00,Homeowner,Issues,Reported Clarification: small
+2026-02-09T15:33:54.198369+00:00,Management,Issues,"Acknowledged issue (severe), service scheduled for 2026-05-19: no"
+2026-02-09T15:33:06.973278+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 3: off -> on
+2026-02-09T15:32:59.187228+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 3: off -> off
+2026-02-09T15:32:58.779355+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 3: on -> off
+2026-02-09T15:32:22.422187+00:00,Management,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T15:31:55.815768+00:00,Management,Moisture Probes,Updated probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T15:31:30.043247+00:00,Management,Moisture Probes,Updated probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T15:26:46.405724+00:00,Management,Weather Rules,"Cool Temperature — Cool Threshold (C): 10 -> 18, Cool Threshold (F): 50 -> 65"
+2026-02-09T15:19:04.568438+00:00,Management,Moisture Probes,Updated probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T15:09:42.969882+00:00,Management,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T14:58:40.551076+00:00,Homeowner,Moisture Probes,Queued sleep disable for Gophr 2ac860 (FluxOpenHome Gophr) (pending wake)
+2026-02-09T14:58:06.403978+00:00,Homeowner,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — entities updated: Extra calibrate_dry: (none) -> ['button.gophr_2ac860_calibrate_moisture_1_dry', 'button.gophr_2ac860_calibrate_moisture_2_dry', 'button.gophr_2ac860_calibrate_moisture_3_dry'], Extra calibrate_wet: (none) -> ['button.gophr_2ac860_calibrate_moisture_1_wet', 'button.gophr_2ac860_calibrate_moisture_2_wet', 'button.gophr_2ac860_calibrate_moisture_3_wet']"
+2026-02-09T14:54:17.225350+00:00,Homeowner,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — Removed zones: switch.irrigation_ctrl_v2_793a8c_zone_10, switch.irrigation_ctrl_v2_793a8c_zone_12, switch.irrigation_ctrl_v2_793a8c_zone_7"
+2026-02-09T14:49:43.301119+00:00,Homeowner,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T14:42:25.551062+00:00,Management,Moisture Probes,Queued sleep disable for Gophr 2ac860 (FluxOpenHome Gophr) (pending wake)
+2026-02-09T14:17:19.312829+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 10.0 min (pending wake)
+2026-02-09T14:00:53.952524+00:00,Homeowner,Device Config,Weather entity: weather.forecast_home -> weather.korl
+2026-02-09T13:39:44.220049+00:00,Homeowner,Connection Key,ZIP: 32765 -> 32827
+2026-02-09T13:39:44.219706+00:00,Homeowner,Connection Key,City: Oviedo -> ORLANDO
+2026-02-09T13:39:44.219234+00:00,Homeowner,Connection Key,"Address: 515 Superior Commerce Point, Suite 1125 -> 8460 KARRER TER"
+2026-02-09T13:21:16.495313+00:00,Homeowner,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_10, switch.irrigation_ctrl_v2_793a8c_zone_12"
+2026-02-09T13:13:18.999684+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 1.0 min (pending wake)
+2026-02-09T13:09:33.604812+00:00,Management,Schedule,Set 793A8C Zone 11 Duration: 1.0 -> 10
+2026-02-09T13:09:28.983173+00:00,Management,Schedule,Set 793A8C Zone 10 Duration: 1.0 -> 15
+2026-02-09T13:04:24.119790+00:00,Homeowner,Schedule,Set 793A8C Zone 9 Duration: 1.0 -> 10
+2026-02-09T13:04:06.692148+00:00,Management,Schedule,Set 793A8C Zone 7 Duration: 2.0 -> 20
+2026-02-09T12:58:48.673825+00:00,Management,Schedule,Set 793A8C Zone 6 Duration: 1.0 -> 15
+2026-02-09T12:58:30.998915+00:00,Management,Schedule,Set 793A8C Zone 5 Duration: 1.0 -> 10
+2026-02-09T12:58:23.683959+00:00,Management,Schedule,Set 793A8C Zone 5 Duration: 1.0 -> 2
+2026-02-09T12:58:16.537741+00:00,Management,Schedule,Set 793A8C Zone 4 Duration: 1.0 -> 40
+2026-02-09T12:58:07.681636+00:00,Management,Schedule,Set 793A8C Zone 3 Duration: 2.0 -> 20
+2026-02-09T12:58:00.495792+00:00,Management,Schedule,Set 793A8C Zone 2 Duration: 1.0 -> 30
+2026-02-09T12:57:54.925626+00:00,Management,Schedule,Set 793A8C Zone 1 Duration: 1.0 -> 15
+2026-02-09T12:57:30.335829+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 15.0 min (pending wake)
+2026-02-09T12:51:05.336576+00:00,Management,Weather Rules,Humidity — Enabled
+2026-02-09T12:51:05.336075+00:00,Management,Weather Rules,Cool Temperature — Enabled
+2026-02-09T12:49:10.329877+00:00,Homeowner,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 10.0 min (pending wake)
+2026-02-09T12:41:47.485039+00:00,Homeowner,Moisture Probes,Set sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 2.0 min (applied immediately)
+2026-02-09T12:38:02.196947+00:00,Homeowner,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — Removed zones: switch.irrigation_ctrl_v2_793a8c_zone_10, switch.irrigation_ctrl_v2_793a8c_zone_5"
+2026-02-09T12:37:41.620968+00:00,Homeowner,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_10, switch.irrigation_ctrl_v2_793a8c_zone_5"
+2026-02-09T12:33:57.309015+00:00,Homeowner,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — Removed zones: switch.irrigation_ctrl_v2_793a8c_zone_10, switch.irrigation_ctrl_v2_793a8c_zone_5"
+2026-02-09T12:31:55.663770+00:00,Homeowner,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_10, switch.irrigation_ctrl_v2_793a8c_zone_5"
+2026-02-09T12:27:48.825676+00:00,Homeowner,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — Removed zones: switch.irrigation_ctrl_v2_793a8c_zone_10, switch.irrigation_ctrl_v2_793a8c_zone_5"
+2026-02-09T12:27:35.671114+00:00,Homeowner,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_10
+2026-02-09T12:22:11.548550+00:00,Management,Schedule,Set 793A8C Zone 15 Duration: 1.0 -> 2
+2026-02-09T12:22:05.779823+00:00,Management,Schedule,Set 793A8C Zone 14 Duration: 1.0 -> 2
+2026-02-09T12:22:03.228928+00:00,Management,Schedule,Set 793A8C Zone 11 Duration: 1.0 -> 2
+2026-02-09T12:21:59.443390+00:00,Management,Schedule,Set 793A8C Zone 13 Duration: 1.0 -> 2
+2026-02-09T12:21:52.762897+00:00,Management,Schedule,Set 793A8C Zone 12 Duration: 1.0 -> 2
+2026-02-09T12:21:19.932137+00:00,Homeowner,Schedule,Set 793A8C Zone 10 Duration: 1.0 -> 2
+2026-02-09T12:21:13.362317+00:00,Homeowner,Schedule,Set 793A8C Zone 10 Duration: 1.0 -> 1
+2026-02-09T12:21:09.942935+00:00,Homeowner,Schedule,Set 793A8C Zone 9 Duration: 1.0 -> 2
+2026-02-09T12:21:01.873025+00:00,Homeowner,Schedule,Set 793A8C Zone 6 Duration: 1.0 -> 2
+2026-02-09T12:20:54.244386+00:00,Homeowner,Schedule,Set 793A8C Zone 5 Duration: 1.0 -> 2
+2026-02-09T12:20:52.020736+00:00,Homeowner,Schedule,Set 793A8C Zone 4 Duration: 1.0 -> 2
+2026-02-09T12:20:46.574051+00:00,Homeowner,Schedule,Set 793A8C Zone 2 Duration: 1.0 -> 2
+2026-02-09T12:20:39.781306+00:00,Homeowner,Schedule,Set 793A8C Zone 3 Duration: 2.0 -> 2
+2026-02-09T12:20:36.992433+00:00,Homeowner,Schedule,Set 793A8C Zone 2 Duration: 1.0 -> 1
+2026-02-09T12:20:34.699339+00:00,Homeowner,Schedule,Set 793A8C Zone 1 Duration: 1.0 -> 2
+2026-02-09T12:17:56.465081+00:00,Homeowner,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T12:17:06.353158+00:00,Homeowner,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_5
+2026-02-09T12:16:10.868664+00:00,Homeowner,Moisture Probes,Sleep disabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T12:08:01.644156+00:00,Homeowner,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 1.0 min (pending wake)
+2026-02-09T12:01:43.041102+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 5.0 min (pending wake)
+2026-02-09T11:59:22.768754+00:00,Management,Moisture Probes,Set sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 5.0 min (applied immediately)
+2026-02-09T11:51:33.752678+00:00,Homeowner,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — entity update (no changes)
+2026-02-09T11:38:11.312899+00:00,Homeowner,Moisture Probes,Sleep Now pressed for Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T11:38:07.550100+00:00,Homeowner,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T11:37:20.577771+00:00,Homeowner,Moisture Probes,Set sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 1.0 min (applied immediately)
+2026-02-09T11:36:41.677386+00:00,Homeowner,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — entity update (no changes)
+2026-02-09T11:34:11.191841+00:00,Homeowner,Moisture Probes,Sleep disabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T11:34:09.055033+00:00,Homeowner,Moisture Probes,Sleep enabled for Gophr 2ac860 (FluxOpenHome Gophr) (applied immediately)
+2026-02-09T11:30:15.980608+00:00,Homeowner,Moisture Probes,"Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_3, switch.irrigation_ctrl_v2_793a8c_zone_7"
+2026-02-09T11:25:38.018741+00:00,Homeowner,Moisture Probes,Added probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T11:24:50.863272+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T11:23:32.467461+00:00,Homeowner,Moisture Probes,Added probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T11:22:23.352457+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T11:22:19.512329+00:00,Homeowner,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — entity update (no changes)
+2026-02-09T11:21:53.594596+00:00,Homeowner,Moisture Probes,Added probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T11:20:04.549340+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T11:09:11.550866+00:00,Homeowner,Moisture Probes,Added probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T10:59:07.707680+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T10:58:26.173142+00:00,Homeowner,Moisture Probes,Added probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T10:55:53.292789+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T10:54:39.071590+00:00,Homeowner,Moisture Probes,Added probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T09:54:47.818110+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T09:46:46.953979+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Enabled: off -> on
+2026-02-09T09:46:41.873187+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Enabled: on -> off
+2026-02-09T09:44:50.403585+00:00,Management,Moisture Probes,Apply Factors to Schedule: Enabled -> Enabled
+2026-02-09T09:44:45.932784+00:00,Management,Moisture Probes,Apply Factors to Schedule: Disabled -> Disabled
+2026-02-09T09:24:28.872520+00:00,Management,Schedule,Set 793A8C Zone 7 Duration: 1.0 -> 2
+2026-02-09T09:23:35.082908+00:00,Management,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_7
+2026-02-09T09:23:02.633600+00:00,Homeowner,Schedule,Set 793A8C Schedule Start Time 4: unknown -> 9:00 PM
+2026-02-09T09:22:55.127311+00:00,Homeowner,Schedule,Set 793A8C Schedule Start Time 3: 1:25 AM -> 1:00 PM
+2026-02-09T09:22:47.366392+00:00,Homeowner,Schedule,Set 793A8C Schedule Start Time 2: 1:05 AM -> 10:00 AM
+2026-02-09T09:22:39.220773+00:00,Homeowner,Schedule,Set 793A8C Schedule Start Time 1: 4:17 AM -> 5:00 AM
+2026-02-09T09:19:00.751509+00:00,Homeowner,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 5.0 min (pending wake)
+2026-02-09T09:16:52.673094+00:00,Homeowner,Schedule,Set 793A8C Schedule Start Time 1: 3:27 AM -> 4:17 AM
+2026-02-09T09:06:28.279421+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 10.0 min (pending wake)
+2026-02-09T08:55:36.426042+00:00,Homeowner,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 2.0 min (pending wake)
+2026-02-09T08:36:31.028028+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 1.0 min (pending wake)
+2026-02-09T08:32:49.701321+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 8: off -> off
+2026-02-09T08:32:43.954898+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 8: off -> on
+2026-02-09T08:32:40.135082+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 15: off -> on
+2026-02-09T08:32:36.178663+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 16: off -> on
+2026-02-09T08:32:33.980877+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 14: off -> on
+2026-02-09T08:32:33.361690+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 13: off -> on
+2026-02-09T08:32:19.927685+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 3: off -> on
+2026-02-09T08:32:17.082475+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 1: off -> on
+2026-02-09T08:32:10.794139+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Enable Zone 1: off -> off
+2026-02-09T08:17:47.910519+00:00,Management,Moisture Probes,Set sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 2.0 min (applied immediately)
+2026-02-09T08:16:29.744136+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 1.0 min (pending wake)
+2026-02-09T08:12:43.404553+00:00,Management,Moisture Probes,Queued sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 2.0 min (pending wake)
+2026-02-09T08:10:37.581753+00:00,Management,Moisture Probes,Set sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 1.5 min (applied immediately)
+2026-02-09T08:10:29.149621+00:00,Management,Moisture Probes,Set sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 1.5 min (applied immediately)
+2026-02-09T08:10:20.303625+00:00,Management,Moisture Probes,Set sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 1.5 min (applied immediately)
+2026-02-09T08:09:22.939504+00:00,Homeowner,System,"Created HA dashboard '/flux-irrigation' (4 views, 48 cards)"
+2026-02-09T07:11:31.919242+00:00,Management,Moisture Probes,Updated probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T06:57:16.227646+00:00,Management,Moisture Probes,Set sleep duration for Gophr 2ac860 (FluxOpenHome Gophr): 90s (applied immediately)
+2026-02-09T06:39:46.843627+00:00,Management,Weather Rules,Humidity — Disabled
+2026-02-09T06:39:46.843181+00:00,Management,Weather Rules,Cool Temperature — Disabled
+2026-02-09T06:30:45.456850+00:00,Management,Zone Control,Emergency stop — all zones
+2026-02-09T06:25:12.222149+00:00,Homeowner,Issues,Reported Severe Issue: MY PUMP EXPLODED...
+2026-02-09T06:24:28.485038+00:00,Management,Schedule,Set 793A8C Schedule Start Time 3: unknown -> 1:25 AM
+2026-02-09T06:24:06.300940+00:00,Management,Moisture Probes,Updated probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T06:14:46.372973+00:00,Management,Moisture Probes,Updated probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T06:03:43.590858+00:00,Management,Schedule,Set 793A8C Zone 5 Duration: 18.0 -> 1
+2026-02-09T06:03:39.843242+00:00,Management,Schedule,Set 793A8C Zone 4 Duration: 18.0 -> 1
+2026-02-09T06:03:34.472205+00:00,Management,Schedule,Set 793A8C Zone 1 Duration: 1.0 -> 1
+2026-02-09T06:03:20.455111+00:00,Management,Schedule,Set 793A8C Schedule Start Time 2: unknown -> 1:05 AM
+2026-02-09T06:03:05.326692+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 6
+2026-02-09T06:00:24.575224+00:00,Management,Schedule,Set 793A8C Zone 3 Duration: 1.0 -> 2
+2026-02-09T06:00:20.108605+00:00,Management,Schedule,Set 793A8C Zone 2 Duration: 1.0 -> 1
+2026-02-09T06:00:14.625310+00:00,Management,Schedule,Set 793A8C Zone 1 Duration: 1.0 -> 1
+2026-02-09T05:59:34.498456+00:00,Homeowner,Device Config,Selected device: 8379338971242fa9f6dfec4d49a5b112
+2026-02-09T05:49:33.320179+00:00,Management,Schedule,Set 793A8C Schedule Start Time 2: 7:50 PM -> 00:50
+2026-02-09T05:49:23.348540+00:00,Management,Schedule,Set 793A8C Schedule Start Time 1: 00:49 -> 00:49
+2026-02-09T05:49:04.043531+00:00,Management,Schedule,Set 793A8C Schedule Start Time 1: 12:48 AM -> 00:49
+2026-02-09T05:47:57.139189+00:00,Management,Schedule,Set 793A8C Schedule Start Time 1: 12:47 AM -> 12:48 AM
+2026-02-09T05:47:48.746596+00:00,Management,Schedule,Set 793A8C Zone 5 Duration: 1.0 -> 30
+2026-02-09T05:47:42.745441+00:00,Management,Schedule,Set 793A8C Zone 4 Duration: 1.0 -> 30
+2026-02-09T05:47:35.117976+00:00,Management,Schedule,Set 793A8C Zone 2 Duration: 1.0 -> 30
+2026-02-09T05:47:25.026098+00:00,Management,Schedule,Set 793A8C Zone 3 Duration: 1.0 -> 30
+2026-02-09T05:47:19.492978+00:00,Management,Schedule,Set 793A8C Zone 1 Duration: 1.0 -> 30
+2026-02-09T05:43:40.192588+00:00,Management,Zone Control,Stopped Irrigation Ctrl V2 793A8C Zone 1
+2026-02-09T05:43:24.744917+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-09T05:43:14.990045+00:00,Management,Schedule,Set 793A8C Schedule Start Time 1: 12:43 AM -> 12:44 AM
+2026-02-09T05:43:02.946322+00:00,Management,Schedule,Set 793A8C Schedule Start Time 1: 12:25 AM -> 12:43 AM
+2026-02-09T05:41:15.824832+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Enabled: unavailable -> on
+2026-02-09T05:16:16.914022+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Sunday: off -> on
+2026-02-09T05:16:14.578576+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Schedule Sunday: on -> off
+2026-02-09T05:15:53.716248+00:00,Management,Schedule,Set 793A8C Schedule Start Time 1: 11:56 PM -> 12:16 AM
+2026-02-09T05:15:25.539378+00:00,Management,Moisture Probes,Moisture probes: Enabled -> Enabled
+2026-02-09T05:15:20.051056+00:00,Management,Moisture Probes,Moisture probes: Disabled -> Disabled
+2026-02-09T05:15:07.418587+00:00,Management,Moisture Probes,Updated probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T05:14:56.803114+00:00,Management,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Removed zones: switch.irrigation_ctrl_v2_793a8c_zone_1
+2026-02-09T05:14:56.802882+00:00,Management,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_3
+2026-02-09T05:01:52.027007+00:00,Management,Moisture Probes,Moisture probes: Enabled -> Enabled
+2026-02-09T05:01:40.686377+00:00,Management,Moisture Probes,Apply Factors to Schedule: Enabled -> Enabled
+2026-02-09T05:01:34.664795+00:00,Management,Moisture Probes,Apply Factors to Schedule: Disabled -> Disabled
+2026-02-09T05:01:24.949813+00:00,Management,Moisture Probes,Moisture probes: Disabled -> Disabled
+2026-02-09T04:57:18.584559+00:00,Management,Moisture Probes,Apply Factors to Schedule: Enabled -> Enabled
+2026-02-09T04:57:10.629755+00:00,Management,Moisture Probes,Apply Factors to Schedule: Disabled -> Disabled
+2026-02-09T04:55:08.416450+00:00,Management,Schedule,Set 793A8C Schedule Start Time 1: 11:50 PM -> 11:56 PM
+2026-02-09T04:48:49.841967+00:00,Homeowner,Schedule,Set 793A8C Schedule Start Time 1: 11:45 PM -> 11:50 PM
+2026-02-09T04:44:47.796301+00:00,Homeowner,Schedule,Set 793A8C Schedule Start Time 1: 11:44 -> 11:45 PM
+2026-02-09T04:43:43.161069+00:00,Homeowner,Schedule,Set 793A8C Schedule Start Time 1: 11:14 PM -> 11:44
+2026-02-09T04:13:22.198268+00:00,Homeowner,Moisture Probes,Apply Factors to Schedule: Enabled -> Enabled
+2026-02-09T04:12:29.112565+00:00,Homeowner,Schedule,Set 793A8C Schedule Start Time 1: 7:35 PM -> 11:14 PM
+2026-02-09T03:23:46.334903+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Auto Advance: off -> on
+2026-02-09T03:23:42.588506+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-09T03:14:44.763937+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-09T03:14:41.318168+00:00,Management,Schedule,Set Irrigation Ctrl V2 793A8C Auto Advance: off -> on
+2026-02-09T02:54:57.315800+00:00,Management,Weather Rules,"Cool Temperature — Cool Threshold (C): -7 -> 10, Cool Threshold (F): 20 -> 50"
+2026-02-09T02:40:33.439124+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-09T02:36:43.259681+00:00,Management,Weather Rules,"Cool Temperature — Cool Threshold (C): 15 -> -7, Cool Threshold (F): 60 -> 20"
+2026-02-09T02:36:04.129163+00:00,Management,Moisture Probes,Root Zone Optimal (%): 45 -> 55
+2026-02-09T02:34:52.100063+00:00,Management,Moisture Probes,Gophr 2ac860 (FluxOpenHome Gophr) — Added zones: switch.irrigation_ctrl_v2_793a8c_zone_1
+2026-02-09T01:48:35.751732+00:00,Homeowner,Moisture Probes,Added probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T01:48:30.819161+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T01:41:33.440456+00:00,Homeowner,Moisture Probes,Added probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T01:33:04.189766+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T01:32:42.644510+00:00,Homeowner,Moisture Probes,Added probe: Gophr 2ac860 (FluxOpenHome Gophr)
+2026-02-09T00:52:02.728565+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 1
+2026-02-09T00:50:59.626017+00:00,Homeowner,Moisture Probes,Added probe: Gophr 1
+2026-02-09T00:50:27.732203+00:00,Homeowner,Moisture Probes,Removed probe: Gophr 1
+2026-02-09T00:45:19.289602+00:00,Management,Zone Control,Started Irrigation Ctrl V2 793A8C Zone 1
+2026-02-09T00:34:18.954643+00:00,Homeowner,Moisture Probes,Moisture probes: Enabled -> Enabled
+2026-02-09T00:30:43.921493+00:00,Homeowner,Moisture Probes,Added probe: Gophr 1
+2026-02-08T23:56:59.795762+00:00,Homeowner,Device Config,Weather: Enabled
+2026-02-08T23:56:57.899239+00:00,Homeowner,Device Config,Weather entity: (none) -> weather.forecast_home
+2026-02-08T23:55:23.298355+00:00,Homeowner,Connection Key,Generated new connection key
+2026-02-08T23:54:47.265316+00:00,Homeowner,Connection Key,Generated new connection key
+2026-02-08T23:54:10.894814+00:00,Homeowner,Device Config,Selected device: 8379338971242fa9f6dfec4d49a5b112
+2026-02-08T23:46:36.555321+00:00,Homeowner,Connection Key,Generated new connection key
+2026-02-08T23:45:54.135717+00:00,Homeowner,Connection Key,Generated new connection key
+2026-02-08T23:43:24.462633+00:00,Homeowner,Connection Key,Generated new connection key
+2026-02-08T23:40:26.438341+00:00,Homeowner,Connection Key,Generated new connection key
+2026-02-08T23:39:16.490691+00:00,Homeowner,Connection Key,Generated new connection key
+2026-02-08T23:39:10.938750+00:00,Homeowner,Connection Key,Generated new connection key
+2026-02-08T23:32:26.195694+00:00,Homeowner,Connection Key,Connection mode: direct -> nabu_casa
+2026-02-08T23:32:26.195522+00:00,Homeowner,Connection Key,Last name: (empty) -> Guidish
+2026-02-08T23:32:26.195345+00:00,Homeowner,Connection Key,First name: (empty) -> Doug
+2026-02-08T23:32:26.195159+00:00,Homeowner,Connection Key,Phone: (empty) -> 2393987736
+2026-02-08T23:32:26.194939+00:00,Homeowner,Connection Key,ZIP: (empty) -> 32765
+2026-02-08T23:32:26.194697+00:00,Homeowner,Connection Key,State: (empty) -> FL
+2026-02-08T23:32:26.194487+00:00,Homeowner,Connection Key,City: (empty) -> Oviedo
+2026-02-08T23:32:26.194290+00:00,Homeowner,Connection Key,"Address: (empty) -> 515 Superior Commerce Point, Suite 1125"
+2026-02-08T23:32:26.194050+00:00,Homeowner,Connection Key,Property label: (empty) -> FLUX Office
+2026-02-08T23:32:26.193812+00:00,Homeowner,Connection Key,URL: (empty) -> https://mdglcb1bpuy6yu5ygnrottmbr9xg4pto.ui.nabu.casa
+2026-02-08T23:32:26.193395+00:00,Homeowner,Connection Key,Generated new connection key
