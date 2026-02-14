@@ -658,25 +658,25 @@ interval:
               (int)((id(sweep_target_3) - id(sweep_start_3)) * t);
 
             // Update LVGL bars
-            lv_bar_set_value(id(bar_sweep_1).get_obj(), id(sim_moisture_1), LV_ANIM_ON);
-            lv_bar_set_value(id(bar_sweep_2).get_obj(), id(sim_moisture_2), LV_ANIM_ON);
-            lv_bar_set_value(id(bar_sweep_3).get_obj(), id(sim_moisture_3), LV_ANIM_ON);
+            lv_bar_set_value(id(bar_sweep_1), id(sim_moisture_1), LV_ANIM_ON);
+            lv_bar_set_value(id(bar_sweep_2), id(sim_moisture_2), LV_ANIM_ON);
+            lv_bar_set_value(id(bar_sweep_3), id(sim_moisture_3), LV_ANIM_ON);
 
             // Update value labels
             char buf[8];
             snprintf(buf, sizeof(buf), "%d%%", id(sim_moisture_1));
-            lv_label_set_text(id(lbl_sweep_val_1).get_obj(), buf);
+            lv_label_set_text(id(lbl_sweep_val_1), buf);
             snprintf(buf, sizeof(buf), "%d%%", id(sim_moisture_2));
-            lv_label_set_text(id(lbl_sweep_val_2).get_obj(), buf);
+            lv_label_set_text(id(lbl_sweep_val_2), buf);
             snprintf(buf, sizeof(buf), "%d%%", id(sim_moisture_3));
-            lv_label_set_text(id(lbl_sweep_val_3).get_obj(), buf);
+            lv_label_set_text(id(lbl_sweep_val_3), buf);
 
             // Update time remaining
             int remaining = (int)(duration - elapsed_s);
             if (remaining < 0) remaining = 0;
             char tbuf[16];
             snprintf(tbuf, sizeof(tbuf), "%d:%02d left", remaining / 60, remaining % 60);
-            lv_label_set_text(id(lbl_sweep_time).get_obj(), tbuf);
+            lv_label_set_text(id(lbl_sweep_time), tbuf);
 
             // Force publish sensor updates
             id(moisture_1_percent).publish_state(id(sim_moisture_1));
@@ -685,7 +685,7 @@ interval:
 
             if (t >= 1.0f) {
               id(sweep_active) = false;
-              lv_label_set_text(id(lbl_sweep_time).get_obj(), "DONE!");
+              lv_label_set_text(id(lbl_sweep_time), "DONE!");
             }
           }
 
@@ -772,28 +772,28 @@ interval:
           id(sim_moisture_1) = (int)roundf(s1);
 
           // Update rain page bars if visible
-          lv_bar_set_value(id(bar_rain_3).get_obj(), id(sim_moisture_3), LV_ANIM_ON);
-          lv_bar_set_value(id(bar_rain_2).get_obj(), id(sim_moisture_2), LV_ANIM_ON);
-          lv_bar_set_value(id(bar_rain_1).get_obj(), id(sim_moisture_1), LV_ANIM_ON);
+          lv_bar_set_value(id(bar_rain_3), id(sim_moisture_3), LV_ANIM_ON);
+          lv_bar_set_value(id(bar_rain_2), id(sim_moisture_2), LV_ANIM_ON);
+          lv_bar_set_value(id(bar_rain_1), id(sim_moisture_1), LV_ANIM_ON);
           {
             char rb[8];
             snprintf(rb, sizeof(rb), "%d%%", id(sim_moisture_3));
-            lv_label_set_text(id(lbl_rain_val_3).get_obj(), rb);
+            lv_label_set_text(id(lbl_rain_val_3), rb);
             snprintf(rb, sizeof(rb), "%d%%", id(sim_moisture_2));
-            lv_label_set_text(id(lbl_rain_val_2).get_obj(), rb);
+            lv_label_set_text(id(lbl_rain_val_2), rb);
             snprintf(rb, sizeof(rb), "%d%%", id(sim_moisture_1));
-            lv_label_set_text(id(lbl_rain_val_1).get_obj(), rb);
+            lv_label_set_text(id(lbl_rain_val_1), rb);
           }
 
           // Also update main page slider labels to reflect sim values
           {
             char mb[8];
             snprintf(mb, sizeof(mb), "%d%%", id(sim_moisture_1));
-            lv_label_set_text(id(lbl_m1_val).get_obj(), mb);
+            lv_label_set_text(id(lbl_m1_val), mb);
             snprintf(mb, sizeof(mb), "%d%%", id(sim_moisture_2));
-            lv_label_set_text(id(lbl_m2_val).get_obj(), mb);
+            lv_label_set_text(id(lbl_m2_val), mb);
             snprintf(mb, sizeof(mb), "%d%%", id(sim_moisture_3));
-            lv_label_set_text(id(lbl_m3_val).get_obj(), mb);
+            lv_label_set_text(id(lbl_m3_val), mb);
           }
 
           // Publish to HA
@@ -813,11 +813,11 @@ interval:
               auto call = id(status_led).turn_on();
               call.perform();
               // Update UI labels
-              lv_label_set_text(id(lbl_awake_status).get_obj(), "AWAKE");
-              lv_obj_set_style_text_color(id(lbl_awake_status).get_obj(), lv_color_hex(0x00E676), 0);
-              lv_label_set_text(id(lbl_sleep_btn).get_obj(), "SLEEP");
-              lv_label_set_text(id(lbl_led_status).get_obj(), "LED: ON");
-              lv_obj_set_style_text_color(id(lbl_led_status).get_obj(), lv_color_hex(0x00E676), 0);
+              lv_label_set_text(id(lbl_awake_status), "AWAKE");
+              lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0x00E676), 0);
+              lv_label_set_text(id(lbl_sleep_btn), "SLEEP");
+              lv_label_set_text(id(lbl_led_status), "LED: ON");
+              lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0x00E676), 0);
             }
           }
 
@@ -1101,16 +1101,16 @@ lvgl:
                       id(device_awake) = false;
                       id(sleep_sequence_active) = true;
                       id(sleep_sequence_start_time) = millis();
-                      lv_label_set_text(id(lbl_awake_status).get_obj(), "SLEEPING");
-                      lv_obj_set_style_text_color(id(lbl_awake_status).get_obj(), lv_color_hex(0xFF3D00), 0);
-                      lv_label_set_text(id(lbl_sleep_btn).get_obj(), "WAKE");
+                      lv_label_set_text(id(lbl_awake_status), "SLEEPING");
+                      lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0xFF3D00), 0);
+                      lv_label_set_text(id(lbl_sleep_btn), "WAKE");
                     } else {
                       // Wake up
                       id(device_awake) = true;
                       id(sleep_sequence_active) = false;
-                      lv_label_set_text(id(lbl_awake_status).get_obj(), "AWAKE");
-                      lv_obj_set_style_text_color(id(lbl_awake_status).get_obj(), lv_color_hex(0x00E676), 0);
-                      lv_label_set_text(id(lbl_sleep_btn).get_obj(), "SLEEP");
+                      lv_label_set_text(id(lbl_awake_status), "AWAKE");
+                      lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0x00E676), 0);
+                      lv_label_set_text(id(lbl_sleep_btn), "SLEEP");
                     }
                 - if:
                     condition:
@@ -1122,7 +1122,7 @@ lvgl:
                           id: lbl_led_status
                           text: "LED: OFF"
                       - lambda: |-
-                          lv_obj_set_style_text_color(id(lbl_led_status).get_obj(), lv_color_hex(0xFF3D00), 0);
+                          lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0xFF3D00), 0);
                     else:
                       - light.turn_on:
                           id: status_led
@@ -1130,7 +1130,7 @@ lvgl:
                           id: lbl_led_status
                           text: "LED: ON"
                       - lambda: |-
-                          lv_obj_set_style_text_color(id(lbl_led_status).get_obj(), lv_color_hex(0x00E676), 0);
+                          lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0x00E676), 0);
 
     # ──────── PAGE: SWEEP CONFIG ────────
     - id: page_sweep_cfg
@@ -1433,9 +1433,9 @@ lvgl:
                     id(sweep_active) = true;
 
                     // Initialize running page bars
-                    lv_bar_set_value(id(bar_sweep_1).get_obj(), id(sim_moisture_1), LV_ANIM_OFF);
-                    lv_bar_set_value(id(bar_sweep_2).get_obj(), id(sim_moisture_2), LV_ANIM_OFF);
-                    lv_bar_set_value(id(bar_sweep_3).get_obj(), id(sim_moisture_3), LV_ANIM_OFF);
+                    lv_bar_set_value(id(bar_sweep_1), id(sim_moisture_1), LV_ANIM_OFF);
+                    lv_bar_set_value(id(bar_sweep_2), id(sim_moisture_2), LV_ANIM_OFF);
+                    lv_bar_set_value(id(bar_sweep_3), id(sim_moisture_3), LV_ANIM_OFF);
                 - lvgl.page.show:
                     id: page_sweep_run
                     animation: MOVE_LEFT
@@ -1923,7 +1923,7 @@ lvgl:
                     id: lbl_rain_status
                     text: "RAINING"
                 - lambda: |-
-                    lv_obj_set_style_text_color(id(lbl_rain_status).get_obj(), lv_color_hex(0x2979FF), 0);
+                    lv_obj_set_style_text_color(id(lbl_rain_status), lv_color_hex(0x2979FF), 0);
 
         - button:
             id: btn_stop_rain
@@ -1945,4 +1945,4 @@ lvgl:
                     id: lbl_rain_status
                     text: "DRYING"
                 - lambda: |-
-                    lv_obj_set_style_text_color(id(lbl_rain_status).get_obj(), lv_color_hex(0xFFAB00), 0);
+                    lv_obj_set_style_text_color(id(lbl_rain_status), lv_color_hex(0xFFAB00), 0);
