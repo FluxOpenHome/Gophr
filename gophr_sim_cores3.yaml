@@ -5,7 +5,7 @@
 substitutions:
   name: "gophr"
   friendly_name: "Gophr"
-  software_version: "1.2.2-sim"
+  software_version: "1.2.3-sim"
 
 esphome:
   name: "${name}"
@@ -29,8 +29,7 @@ esphome:
       - delay: 5s
       - lvgl.page.show:
           id: page_main
-          animation: FADE_IN
-          time: 500ms
+          animation: NONE
       - light.turn_on:
           id: status_led
       - lambda: |-
@@ -165,13 +164,7 @@ output:
       - lambda: |-
           id(status_led_state) = state;
 
-# NOTE: Copy gophr.png into your ESPHome config directory alongside this YAML
-image:
-  - id: gophr_logo
-    file: "gophr.png"
-    resize: 140x80
-    type: RGB565
-    transparency: alpha_channel
+# Logo image removed to save RAM — using text-only splash
 
 display:
   - platform: ili9xxx
@@ -962,29 +955,25 @@ lvgl:
       bg_color: 0x0D0D0D
       bg_opa: COVER
       widgets:
-        - image:
-            src: gophr_logo
-            align: CENTER
-            y: -25
         - label:
             text: "GOPHR"
             text_font: montserrat_28
             text_color: 0x00E676
             align: CENTER
-            y: 45
+            y: -10
         - label:
             text: "Moisture Simulator"
             text_font: montserrat_12
             text_color: 0x888888
             align: CENTER
-            y: 68
+            y: 25
         - label:
             id: lbl_splash_status
             text: "Starting..."
             text_font: montserrat_12
             text_color: 0x555555
             align: CENTER
-            y: 88
+            y: 45
 
     # ──────── PAGE: MAIN ────────
     - id: page_main
