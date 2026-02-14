@@ -5,7 +5,7 @@
 substitutions:
   name: "gophr"
   friendly_name: "Gophr"
-  software_version: "1.3.1-sim"
+  software_version: "1.4.0-sim"
 
 esphome:
   name: "${name}"
@@ -27,6 +27,9 @@ esphome:
           lv_group_t *gr = lv_group_create();
           lv_group_t *gx = lv_group_create();
           lv_group_t *gn = lv_group_create();
+          lv_group_t *gps = lv_group_create();
+          lv_group_t *gpp = lv_group_create();
+          lv_group_t *gpd = lv_group_create();
 
           // page_main (S3 top, S2 mid, S1 bottom)
           lv_group_add_obj(gm, id(slider_m3));
@@ -40,7 +43,7 @@ esphome:
           lv_group_add_obj(gs, id(slider_sweep_t1));
           lv_group_add_obj(gs, id(slider_sweep_t2));
           lv_group_add_obj(gs, id(slider_sweep_t3));
-          lv_group_add_obj(gs, (lv_obj_t*)id(btnm_duration));
+          lv_group_add_obj(gs, id(btn_pick_duration));
           lv_group_add_obj(gs, id(btn_dir_up));
           lv_group_add_obj(gs, id(btn_dir_down));
           lv_group_add_obj(gs, id(btn_start_sweep));
@@ -55,12 +58,32 @@ esphome:
           lv_group_add_obj(gx, id(btn_back_sim_select));
 
           // page_rain
-          lv_group_add_obj(gn, (lv_obj_t*)id(btnm_soil));
-          lv_group_add_obj(gn, (lv_obj_t*)id(btnm_precip));
+          lv_group_add_obj(gn, id(btn_pick_soil));
+          lv_group_add_obj(gn, id(btn_pick_precip));
           lv_group_add_obj(gn, id(slider_time_factor));
           lv_group_add_obj(gn, id(btn_start_rain));
           lv_group_add_obj(gn, id(btn_stop_rain));
           lv_group_add_obj(gn, id(btn_back_rain));
+
+          // page_pick_soil
+          lv_group_add_obj(gps, id(btn_sel_sand));
+          lv_group_add_obj(gps, id(btn_sel_loam));
+          lv_group_add_obj(gps, id(btn_sel_clay));
+          lv_group_add_obj(gps, id(btn_sel_silt));
+
+          // page_pick_precip
+          lv_group_add_obj(gpp, id(btn_sel_drizzle));
+          lv_group_add_obj(gpp, id(btn_sel_rain));
+          lv_group_add_obj(gpp, id(btn_sel_heavy));
+          lv_group_add_obj(gpp, id(btn_sel_downpour));
+
+          // page_pick_duration
+          lv_group_add_obj(gpd, id(btn_sel_30s));
+          lv_group_add_obj(gpd, id(btn_sel_1m));
+          lv_group_add_obj(gpd, id(btn_sel_5m));
+          lv_group_add_obj(gpd, id(btn_sel_15m));
+          lv_group_add_obj(gpd, id(btn_sel_30m));
+          lv_group_add_obj(gpd, id(btn_sel_1h));
 
           // Store group pointers
           id(grp_main) = (void*)gm;
@@ -68,6 +91,9 @@ esphome:
           id(grp_sweep_run) = (void*)gr;
           id(grp_sim_select) = (void*)gx;
           id(grp_rain) = (void*)gn;
+          id(grp_pick_soil) = (void*)gps;
+          id(grp_pick_precip) = (void*)gpp;
+          id(grp_pick_duration) = (void*)gpd;
 
           // Find encoder indev and assign initial group
           lv_indev_t *enc = nullptr;
@@ -362,6 +388,18 @@ globals:
     restore_value: no
     initial_value: 'nullptr'
   - id: grp_rain
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
+  - id: grp_pick_soil
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
+  - id: grp_pick_precip
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
+  - id: grp_pick_duration
     type: void*
     restore_value: no
     initial_value: 'nullptr'
@@ -1217,8 +1255,7 @@ lvgl:
               then:
                 - lvgl.page.show:
                     id: page_sim_select
-                    animation: MOVE_LEFT
-                    time: 300ms
+                    animation: NONE
 
         - button:
             id: btn_sleep_toggle
@@ -1403,71 +1440,32 @@ lvgl:
             x: 184
             y: 73
 
-        # --- Duration ---
+        # --- Duration selector button ---
         - label:
-            id: lbl_duration_val
-            text: "1m"
-            text_font: montserrat_12
-            text_color: 0x00E676
-            align: TOP_MID
-            y: 92
-
-        - buttonmatrix:
-            id: btnm_duration
+            text: "Duration:"
+            text_font: montserrat_10
+            text_color: 0x888888
             x: 25
-            y: 106
-            width: 190
-            height: 26
-            rows:
-              - buttons:
-                  - id: btn_d_30s
-                    text: "30s"
-                    on_value:
-                      then:
-                        - lambda: 'id(sweep_duration_sec) = 30;'
-                        - lvgl.label.update:
-                            id: lbl_duration_val
-                            text: "30s"
-                  - id: btn_d_1m
-                    text: "1m"
-                    on_value:
-                      then:
-                        - lambda: 'id(sweep_duration_sec) = 60;'
-                        - lvgl.label.update:
-                            id: lbl_duration_val
-                            text: "1m"
-                  - id: btn_d_5m
-                    text: "5m"
-                    on_value:
-                      then:
-                        - lambda: 'id(sweep_duration_sec) = 300;'
-                        - lvgl.label.update:
-                            id: lbl_duration_val
-                            text: "5m"
-                  - id: btn_d_15m
-                    text: "15m"
-                    on_value:
-                      then:
-                        - lambda: 'id(sweep_duration_sec) = 900;'
-                        - lvgl.label.update:
-                            id: lbl_duration_val
-                            text: "15m"
-                  - id: btn_d_30m
-                    text: "30m"
-                    on_value:
-                      then:
-                        - lambda: 'id(sweep_duration_sec) = 1800;'
-                        - lvgl.label.update:
-                            id: lbl_duration_val
-                            text: "30m"
-                  - id: btn_d_1h
-                    text: "1h"
-                    on_value:
-                      then:
-                        - lambda: 'id(sweep_duration_sec) = 3600;'
-                        - lvgl.label.update:
-                            id: lbl_duration_val
-                            text: "1h"
+            y: 96
+        - button:
+            id: btn_pick_duration
+            x: 95
+            y: 92
+            width: 80
+            height: 24
+            styles: style_btn_outline
+            widgets:
+              - label:
+                  id: lbl_duration_val
+                  text: "1m"
+                  text_font: montserrat_10
+                  align: CENTER
+                  text_color: 0x00E676
+            on_click:
+              then:
+                - lvgl.page.show:
+                    id: page_pick_duration
+                    animation: NONE
 
         # --- Direction + Start row ---
         - button:
@@ -1543,8 +1541,7 @@ lvgl:
                     lv_bar_set_value(id(bar_sweep_3), id(sim_moisture_3), LV_ANIM_OFF);
                 - lvgl.page.show:
                     id: page_sweep_run
-                    animation: MOVE_LEFT
-                    time: 300ms
+                    animation: NONE
 
         # --- Back ---
         - button:
@@ -1564,8 +1561,7 @@ lvgl:
               then:
                 - lvgl.page.show:
                     id: page_sim_select
-                    animation: MOVE_RIGHT
-                    time: 300ms
+                    animation: NONE
 
     # ──────── PAGE: SWEEP RUNNING ────────
     - id: page_sweep_run
@@ -1691,8 +1687,7 @@ lvgl:
                 - lambda: 'id(sweep_active) = false;'
                 - lvgl.page.show:
                     id: page_sim_select
-                    animation: MOVE_RIGHT
-                    time: 300ms
+                    animation: NONE
 
     # ──────── PAGE: SIM MODE SELECT ────────
     - id: page_sim_select
@@ -1728,8 +1723,7 @@ lvgl:
               then:
                 - lvgl.page.show:
                     id: page_sweep_cfg
-                    animation: MOVE_LEFT
-                    time: 300ms
+                    animation: NONE
 
         - button:
             id: btn_mode_rain
@@ -1748,8 +1742,7 @@ lvgl:
               then:
                 - lvgl.page.show:
                     id: page_rain
-                    animation: MOVE_LEFT
-                    time: 300ms
+                    animation: NONE
 
         - button:
             id: btn_back_sim_select
@@ -1768,8 +1761,7 @@ lvgl:
               then:
                 - lvgl.page.show:
                     id: page_main
-                    animation: MOVE_RIGHT
-                    time: 300ms
+                    animation: NONE
 
     # ──────── PAGE: RAIN SIMULATION ────────
     - id: page_rain
@@ -1797,65 +1789,59 @@ lvgl:
             align: TOP_MID
             y: 34
 
-        # --- Soil type selector ---
-        - buttonmatrix:
-            id: btnm_soil
+        # --- Soil type selector button ---
+        - label:
+            text: "Soil:"
+            text_font: montserrat_10
+            text_color: 0x888888
             x: 25
-            y: 48
-            width: 190
+            y: 50
+        - button:
+            id: btn_pick_soil
+            x: 68
+            y: 46
+            width: 80
             height: 24
-            rows:
-              - buttons:
-                  - id: btn_sand
-                    text: "SND"
-                    on_value:
-                      then:
-                        - lambda: 'id(soil_type) = 0;'
-                  - id: btn_loam
-                    text: "LOM"
-                    on_value:
-                      then:
-                        - lambda: 'id(soil_type) = 1;'
-                  - id: btn_clay
-                    text: "CLY"
-                    on_value:
-                      then:
-                        - lambda: 'id(soil_type) = 2;'
-                  - id: btn_silt
-                    text: "SLT"
-                    on_value:
-                      then:
-                        - lambda: 'id(soil_type) = 3;'
+            styles: style_btn_outline
+            widgets:
+              - label:
+                  id: lbl_soil_val
+                  text: "Sand"
+                  text_font: montserrat_10
+                  align: CENTER
+                  text_color: 0x00E676
+            on_click:
+              then:
+                - lvgl.page.show:
+                    id: page_pick_soil
+                    animation: NONE
 
-        # --- Precipitation rate selector ---
-        - buttonmatrix:
-            id: btnm_precip
+        # --- Precipitation rate selector button ---
+        - label:
+            text: "Rain:"
+            text_font: montserrat_10
+            text_color: 0x888888
             x: 25
             y: 76
-            width: 190
+        - button:
+            id: btn_pick_precip
+            x: 68
+            y: 72
+            width: 80
             height: 24
-            rows:
-              - buttons:
-                  - id: btn_drizzle
-                    text: "DRIZ"
-                    on_value:
-                      then:
-                        - lambda: 'id(precip_rate) = 0;'
-                  - id: btn_rain_rate
-                    text: "RAIN"
-                    on_value:
-                      then:
-                        - lambda: 'id(precip_rate) = 1;'
-                  - id: btn_heavy
-                    text: "HEVY"
-                    on_value:
-                      then:
-                        - lambda: 'id(precip_rate) = 2;'
-                  - id: btn_pour
-                    text: "POUR"
-                    on_value:
-                      then:
-                        - lambda: 'id(precip_rate) = 3;'
+            styles: style_btn_outline
+            widgets:
+              - label:
+                  id: lbl_precip_val
+                  text: "Drizzle"
+                  text_font: montserrat_10
+                  align: CENTER
+                  text_color: 0x00E676
+            on_click:
+              then:
+                - lvgl.page.show:
+                    id: page_pick_precip
+                    animation: NONE
 
         # --- Time factor ---
         - label:
@@ -1996,8 +1982,7 @@ lvgl:
                     id(rain_ever_started) = false;
                 - lvgl.page.show:
                     id: page_sim_select
-                    animation: MOVE_RIGHT
-                    time: 300ms
+                    animation: NONE
 
         - button:
             id: btn_start_rain
@@ -2049,3 +2034,362 @@ lvgl:
                     text: "DRYING"
                 - lambda: |-
                     lv_obj_set_style_text_color(id(lbl_rain_status), lv_color_hex(0xFFAB00), 0);
+
+    # ──────── PAGE: PICK SOIL TYPE ────────
+    - id: page_pick_soil
+      bg_color: 0x0D0D0D
+      bg_opa: COVER
+      on_load:
+        then:
+          - lambda: |-
+              if (id(enc_indev) != nullptr)
+                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_pick_soil));
+      widgets:
+        - label:
+            text: "SELECT SOIL"
+            text_font: montserrat_14
+            text_color: 0x888888
+            align: TOP_MID
+            y: 30
+        - button:
+            id: btn_sel_sand
+            align: CENTER
+            y: -30
+            width: 140
+            height: 30
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "Sand"
+                  text_font: montserrat_14
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(soil_type) = 0;'
+                - lvgl.label.update:
+                    id: lbl_soil_val
+                    text: "Sand"
+                - lvgl.page.show:
+                    id: page_rain
+                    animation: NONE
+        - button:
+            id: btn_sel_loam
+            align: CENTER
+            y: 6
+            width: 140
+            height: 30
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "Loam"
+                  text_font: montserrat_14
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(soil_type) = 1;'
+                - lvgl.label.update:
+                    id: lbl_soil_val
+                    text: "Loam"
+                - lvgl.page.show:
+                    id: page_rain
+                    animation: NONE
+        - button:
+            id: btn_sel_clay
+            align: CENTER
+            y: 42
+            width: 140
+            height: 30
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "Clay"
+                  text_font: montserrat_14
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(soil_type) = 2;'
+                - lvgl.label.update:
+                    id: lbl_soil_val
+                    text: "Clay"
+                - lvgl.page.show:
+                    id: page_rain
+                    animation: NONE
+        - button:
+            id: btn_sel_silt
+            align: CENTER
+            y: 78
+            width: 140
+            height: 30
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "Silt"
+                  text_font: montserrat_14
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(soil_type) = 3;'
+                - lvgl.label.update:
+                    id: lbl_soil_val
+                    text: "Silt"
+                - lvgl.page.show:
+                    id: page_rain
+                    animation: NONE
+
+    # ──────── PAGE: PICK PRECIPITATION ────────
+    - id: page_pick_precip
+      bg_color: 0x0D0D0D
+      bg_opa: COVER
+      on_load:
+        then:
+          - lambda: |-
+              if (id(enc_indev) != nullptr)
+                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_pick_precip));
+      widgets:
+        - label:
+            text: "SELECT RAIN"
+            text_font: montserrat_14
+            text_color: 0x888888
+            align: TOP_MID
+            y: 30
+        - button:
+            id: btn_sel_drizzle
+            align: CENTER
+            y: -30
+            width: 140
+            height: 30
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "Drizzle"
+                  text_font: montserrat_14
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(precip_rate) = 0;'
+                - lvgl.label.update:
+                    id: lbl_precip_val
+                    text: "Drizzle"
+                - lvgl.page.show:
+                    id: page_rain
+                    animation: NONE
+        - button:
+            id: btn_sel_rain
+            align: CENTER
+            y: 6
+            width: 140
+            height: 30
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "Rain"
+                  text_font: montserrat_14
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(precip_rate) = 1;'
+                - lvgl.label.update:
+                    id: lbl_precip_val
+                    text: "Rain"
+                - lvgl.page.show:
+                    id: page_rain
+                    animation: NONE
+        - button:
+            id: btn_sel_heavy
+            align: CENTER
+            y: 42
+            width: 140
+            height: 30
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "Heavy"
+                  text_font: montserrat_14
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(precip_rate) = 2;'
+                - lvgl.label.update:
+                    id: lbl_precip_val
+                    text: "Heavy"
+                - lvgl.page.show:
+                    id: page_rain
+                    animation: NONE
+        - button:
+            id: btn_sel_downpour
+            align: CENTER
+            y: 78
+            width: 140
+            height: 30
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "Downpour"
+                  text_font: montserrat_14
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(precip_rate) = 3;'
+                - lvgl.label.update:
+                    id: lbl_precip_val
+                    text: "Downpour"
+                - lvgl.page.show:
+                    id: page_rain
+                    animation: NONE
+
+    # ──────── PAGE: PICK DURATION ────────
+    - id: page_pick_duration
+      bg_color: 0x0D0D0D
+      bg_opa: COVER
+      on_load:
+        then:
+          - lambda: |-
+              if (id(enc_indev) != nullptr)
+                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_pick_duration));
+      widgets:
+        - label:
+            text: "SWEEP DURATION"
+            text_font: montserrat_14
+            text_color: 0x888888
+            align: TOP_MID
+            y: 24
+        - button:
+            id: btn_sel_30s
+            x: 30
+            y: 50
+            width: 80
+            height: 28
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "30 sec"
+                  text_font: montserrat_12
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(sweep_duration_sec) = 30;'
+                - lvgl.label.update:
+                    id: lbl_duration_val
+                    text: "30s"
+                - lvgl.page.show:
+                    id: page_sweep_cfg
+                    animation: NONE
+        - button:
+            id: btn_sel_1m
+            x: 130
+            y: 50
+            width: 80
+            height: 28
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "1 min"
+                  text_font: montserrat_12
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(sweep_duration_sec) = 60;'
+                - lvgl.label.update:
+                    id: lbl_duration_val
+                    text: "1m"
+                - lvgl.page.show:
+                    id: page_sweep_cfg
+                    animation: NONE
+        - button:
+            id: btn_sel_5m
+            x: 30
+            y: 86
+            width: 80
+            height: 28
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "5 min"
+                  text_font: montserrat_12
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(sweep_duration_sec) = 300;'
+                - lvgl.label.update:
+                    id: lbl_duration_val
+                    text: "5m"
+                - lvgl.page.show:
+                    id: page_sweep_cfg
+                    animation: NONE
+        - button:
+            id: btn_sel_15m
+            x: 130
+            y: 86
+            width: 80
+            height: 28
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "15 min"
+                  text_font: montserrat_12
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(sweep_duration_sec) = 900;'
+                - lvgl.label.update:
+                    id: lbl_duration_val
+                    text: "15m"
+                - lvgl.page.show:
+                    id: page_sweep_cfg
+                    animation: NONE
+        - button:
+            id: btn_sel_30m
+            x: 30
+            y: 122
+            width: 80
+            height: 28
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "30 min"
+                  text_font: montserrat_12
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(sweep_duration_sec) = 1800;'
+                - lvgl.label.update:
+                    id: lbl_duration_val
+                    text: "30m"
+                - lvgl.page.show:
+                    id: page_sweep_cfg
+                    animation: NONE
+        - button:
+            id: btn_sel_1h
+            x: 130
+            y: 122
+            width: 80
+            height: 28
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "1 hour"
+                  text_font: montserrat_12
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: 'id(sweep_duration_sec) = 3600;'
+                - lvgl.label.update:
+                    id: lbl_duration_val
+                    text: "1h"
+                - lvgl.page.show:
+                    id: page_sweep_cfg
+                    animation: NONE

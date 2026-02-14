@@ -85,7 +85,7 @@ jobs:
 
           # Factory bin → firmware/ (to commit to repo)
           for file in "$BUILD_DIR"/*.factory.bin; do
-            [ -f "$file" ] && cp "$file" "firmware/${NAME}.factory.bin"
+            [ -f "$file" ] && cp "$file" "firmware/${NAME}-${VERSION}.factory.bin"
           done
 
           echo "Release files:"
