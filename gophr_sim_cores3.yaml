@@ -131,6 +131,7 @@ output:
       - lambda: |-
           id(status_led_state) = state;
 
+# NOTE: Copy gophr.png into your ESPHome config directory alongside this YAML
 image:
   - id: gophr_logo
     file: "gophr.png"
