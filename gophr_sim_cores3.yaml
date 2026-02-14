@@ -1,4 +1,4 @@
-# Gophr Simulator - M5Stack CoreS3
+# Gophr Simulator - M5Stack Dial (StampS3)
 # Simulates the Gophr moisture probe for HA testing
 # Entity names match the real gophr.yaml device
 
@@ -35,19 +35,12 @@ esphome:
           id(status_led_state) = true;
 
 esp32:
-  board: esp32-s3-devkitc-1
-  flash_size: 8MB
+  variant: esp32s3
   framework:
     type: esp-idf
-    sdkconfig_options:
-      CONFIG_ESP32S3_INSTRUCTION_CACHE_32KB: "y"
 
-# NOTE: Uncomment psram section below if using CoreS3 (not SE) with PSRAM
-# Also add these sdkconfig_options: CONFIG_ESP32S3_DATA_CACHE_64KB,
-# CONFIG_ESP32S3_DATA_CACHE_LINE_64B, CONFIG_SPIRAM_RODATA, CONFIG_SPIRAM_FETCH_INSTRUCTIONS
-# psram:
-#   mode: octal
-#   speed: 80MHz
+platformio_options:
+  board_build.flash_mode: dio
 
 logger:
   level: DEBUG
@@ -78,50 +71,23 @@ web_server:
   port: 80
 
 # ──────────────────────────────────────────────
-# CoreS3 Hardware
+# M5Stack Dial (StampS3) Hardware
 # ──────────────────────────────────────────────
 
 i2c:
-  - id: bus_internal
-    sda: GPIO12
-    scl: GPIO11
+  - id: internal_i2c
+    sda: GPIO11
+    scl: GPIO12
 
 spi:
   - id: spi_bus
-    clk_pin: GPIO36
-    mosi_pin: GPIO37
-
-external_components:
-  - source: github://m5stack/esphome-yaml/components
-    components: [axp2101, aw9523b]
-
-axp2101:
-  id: axp2101_pmu
-  i2c_id: bus_internal
-
-aw9523b:
-  - id: aw9523b_hub
-    i2c_id: bus_internal
+    clk_pin: GPIO6
+    mosi_pin: GPIO5
 
 output:
-  - platform: axp2101
-    type: range
-    channel: DLDO1
+  - platform: ledc
+    pin: GPIO9
     id: lcd_backlight_output
-    min_voltage: 2600
-    max_voltage: 3300
-  - platform: axp2101
-    channel: ALDO1
-    voltage: 1800
-  - platform: axp2101
-    channel: ALDO2
-    voltage: 3300
-  - platform: axp2101
-    channel: BLDO1
-    voltage: 2800
-  - platform: axp2101
-    channel: BLDO2
-    voltage: 1500
   # Virtual output for the Status LED light entity
   - platform: template
     type: binary
@@ -134,35 +100,25 @@ output:
 image:
   - id: gophr_logo
     file: "gophr.png"
-    resize: 200x115
+    resize: 140x80
     type: RGB565
     transparency: alpha_channel
 
 display:
-  - platform: mipi_spi
-    model: M5CORE
-    dc_pin: GPIO35
-    reset_pin:
-      aw9523b: aw9523b_hub
-      number: 9
-    cs_pin: GPIO3
-    data_rate: 40MHz
-    invert_colors: true
-    id: m5cores3_lcd
+  - platform: ili9xxx
+    model: GC9A01A
+    cs_pin: GPIO7
+    reset_pin: GPIO8
+    dc_pin: GPIO4
+    id: dial_lcd
     auto_clear_enabled: false
     update_interval: never
 
 touchscreen:
-  - platform: ft63x6
+  - platform: ft5x06
     id: touch
-    reset_pin:
-      aw9523b: aw9523b_hub
-      number: 0
-    calibration:
-      x_min: 0
-      x_max: 320
-      y_min: 0
-      y_max: 240
+    i2c_id: internal_i2c
+    address: 0x38
 
 # LCD backlight - always on
 light:
@@ -173,7 +129,7 @@ light:
     entity_category: config
     output: lcd_backlight_output
     restore_mode: RESTORE_DEFAULT_ON
-    default_transition_length: 250ms
+    default_transition_length: 0s
 
 # Status LED (virtual) - binary light that reports on/off to HA
 # Simulates the WS2812B LED on the real device
@@ -826,7 +782,7 @@ interval:
 
 lvgl:
   displays:
-    - m5cores3_lcd
+    - dial_lcd
   touchscreens:
     - touchscreen_id: touch
   color_depth: 16
