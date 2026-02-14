@@ -817,73 +817,69 @@ lvgl:
         - image:
             src: gophr_logo
             align: CENTER
-            y: -20
+            y: -25
         - label:
             text: "GOPHR"
             text_font: montserrat_28
             text_color: 0x00E676
             align: CENTER
-            y: 60
+            y: 45
         - label:
-            text: "Moisture Probe Simulator"
-            text_font: montserrat_14
+            text: "Moisture Simulator"
+            text_font: montserrat_12
             text_color: 0x888888
             align: CENTER
-            y: 85
+            y: 68
         - label:
             id: lbl_splash_status
             text: "Starting..."
             text_font: montserrat_12
             text_color: 0x555555
             align: CENTER
-            y: 110
+            y: 88
 
     # ──────── PAGE: MAIN ────────
     - id: page_main
       bg_color: 0x0D0D0D
       widgets:
-        # Title
+        # Title row
         - label:
             text: "GOPHR SIM"
-            text_font: montserrat_14
+            text_font: montserrat_12
             text_color: 0x888888
-            x: 10
-            y: 6
+            align: TOP_MID
+            y: 18
 
-        # Awake status indicator
+        # Status row
         - label:
             id: lbl_awake_status
             text: "AWAKE"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0x00E676
-            align: TOP_RIGHT
-            x: -10
-            y: 2
-
-        # LED status indicator
+            x: 30
+            y: 36
         - label:
             id: lbl_led_status
             text: "LED: ON"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0x00E676
             align: TOP_RIGHT
-            x: -10
-            y: 16
+            x: -30
+            y: 36
 
         # --- Sensor 1: SHALLOW ---
         - label:
-            text: "S1 SHALLOW"
-            text_font: montserrat_12
-            text_color: 0x888888
-            x: 10
-            y: 30
-
+            text: "S1"
+            text_font: montserrat_10
+            text_color: 0x2979FF
+            x: 22
+            y: 52
         - slider:
             id: slider_m1
-            x: 10
-            y: 48
-            width: 250
-            height: 18
+            x: 38
+            y: 52
+            width: 140
+            height: 14
             min_value: 0
             max_value: 100
             value: 50
@@ -892,9 +888,9 @@ lvgl:
               bg_color: 0x2979FF
             knob:
               bg_color: 0xFFFFFF
-              radius: 9
-              width: 18
-              height: 18
+              radius: 7
+              width: 14
+              height: 14
             on_value:
               then:
                 - lambda: 'id(sim_moisture_1) = (int)x;'
@@ -903,29 +899,27 @@ lvgl:
                     text:
                       format: "%d%%"
                       args: ['(int)x']
-
         - label:
             id: lbl_m1_val
             text: "50%"
-            text_font: montserrat_14
+            text_font: montserrat_12
             text_color: 0xFFFFFF
-            x: 270
-            y: 48
+            x: 184
+            y: 51
 
         # --- Sensor 2: MID ---
         - label:
-            text: "S2 MID"
-            text_font: montserrat_12
-            text_color: 0x888888
-            x: 10
-            y: 76
-
+            text: "S2"
+            text_font: montserrat_10
+            text_color: 0x00BFA5
+            x: 22
+            y: 74
         - slider:
             id: slider_m2
-            x: 10
-            y: 94
-            width: 250
-            height: 18
+            x: 38
+            y: 74
+            width: 140
+            height: 14
             min_value: 0
             max_value: 100
             value: 50
@@ -934,9 +928,9 @@ lvgl:
               bg_color: 0x00BFA5
             knob:
               bg_color: 0xFFFFFF
-              radius: 9
-              width: 18
-              height: 18
+              radius: 7
+              width: 14
+              height: 14
             on_value:
               then:
                 - lambda: 'id(sim_moisture_2) = (int)x;'
@@ -945,29 +939,27 @@ lvgl:
                     text:
                       format: "%d%%"
                       args: ['(int)x']
-
         - label:
             id: lbl_m2_val
             text: "50%"
-            text_font: montserrat_14
+            text_font: montserrat_12
             text_color: 0xFFFFFF
-            x: 270
-            y: 94
+            x: 184
+            y: 73
 
         # --- Sensor 3: DEEP ---
         - label:
-            text: "S3 DEEP"
-            text_font: montserrat_12
-            text_color: 0x888888
-            x: 10
-            y: 122
-
+            text: "S3"
+            text_font: montserrat_10
+            text_color: 0xFFAB00
+            x: 22
+            y: 96
         - slider:
             id: slider_m3
-            x: 10
-            y: 140
-            width: 250
-            height: 18
+            x: 38
+            y: 96
+            width: 140
+            height: 14
             min_value: 0
             max_value: 100
             value: 50
@@ -976,9 +968,9 @@ lvgl:
               bg_color: 0xFFAB00
             knob:
               bg_color: 0xFFFFFF
-              radius: 9
-              width: 18
-              height: 18
+              radius: 7
+              width: 14
+              height: 14
             on_value:
               then:
                 - lambda: 'id(sim_moisture_3) = (int)x;'
@@ -987,26 +979,26 @@ lvgl:
                     text:
                       format: "%d%%"
                       args: ['(int)x']
-
         - label:
             id: lbl_m3_val
             text: "50%"
-            text_font: montserrat_14
+            text_font: montserrat_12
             text_color: 0xFFFFFF
-            x: 270
-            y: 140
+            x: 184
+            y: 95
 
         # --- Bottom buttons ---
         - button:
             id: btn_send
-            x: 10
-            y: 180
-            width: 80
-            height: 45
+            x: 20
+            y: 120
+            width: 60
+            height: 32
             styles: style_btn
             widgets:
               - label:
                   text: "SEND"
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0x0D0D0D
             on_click:
@@ -1018,14 +1010,15 @@ lvgl:
 
         - button:
             id: btn_goto_sim
-            x: 100
-            y: 180
-            width: 100
-            height: 45
+            x: 88
+            y: 120
+            width: 64
+            height: 32
             styles: style_btn_outline
             widgets:
               - label:
                   text: "SIM >"
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0x00E676
             on_click:
@@ -1037,22 +1030,22 @@ lvgl:
 
         - button:
             id: btn_sleep_toggle
-            x: 210
-            y: 180
-            width: 100
-            height: 45
+            x: 160
+            y: 120
+            width: 64
+            height: 32
             styles: style_btn_outline
             widgets:
               - label:
                   id: lbl_sleep_btn
                   text: "SLEEP"
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0x00E676
             on_click:
               then:
                 - lambda: |-
                     if (id(device_awake)) {
-                      // Go to sleep
                       id(device_awake) = false;
                       id(sleep_sequence_active) = true;
                       id(sleep_sequence_start_time) = millis();
@@ -1060,7 +1053,6 @@ lvgl:
                       lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0xFF3D00), 0);
                       lv_label_set_text(id(lbl_sleep_btn), "WAKE");
                     } else {
-                      // Wake up
                       id(device_awake) = true;
                       id(sleep_sequence_active) = false;
                       lv_label_set_text(id(lbl_awake_status), "AWAKE");
@@ -1092,26 +1084,25 @@ lvgl:
       bg_color: 0x0D0D0D
       widgets:
         - label:
-            text: "SWEEP CONFIG"
-            text_font: montserrat_14
+            text: "SWEEP CFG"
+            text_font: montserrat_12
             text_color: 0x888888
             align: TOP_MID
-            y: 4
+            y: 18
 
         # --- S1 Target ---
         - label:
             text: "S1"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0x888888
-            x: 5
-            y: 28
-
+            x: 22
+            y: 38
         - slider:
             id: slider_sweep_t1
-            x: 25
-            y: 28
-            width: 200
-            height: 14
+            x: 38
+            y: 38
+            width: 140
+            height: 12
             min_value: 0
             max_value: 100
             value: 80
@@ -1120,7 +1111,7 @@ lvgl:
               bg_color: 0x2979FF
             knob:
               bg_color: 0xFFFFFF
-              radius: 7
+              radius: 6
             on_value:
               then:
                 - lambda: 'id(sweep_target_1) = (int)x;'
@@ -1129,29 +1120,27 @@ lvgl:
                     text:
                       format: "%d%%"
                       args: ['(int)x']
-
         - label:
             id: lbl_st1
             text: "80%"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFFFFFF
-            x: 232
-            y: 28
+            x: 184
+            y: 37
 
         # --- S2 Target ---
         - label:
             text: "S2"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0x888888
-            x: 5
-            y: 54
-
+            x: 22
+            y: 56
         - slider:
             id: slider_sweep_t2
-            x: 25
-            y: 54
-            width: 200
-            height: 14
+            x: 38
+            y: 56
+            width: 140
+            height: 12
             min_value: 0
             max_value: 100
             value: 80
@@ -1160,7 +1149,7 @@ lvgl:
               bg_color: 0x00BFA5
             knob:
               bg_color: 0xFFFFFF
-              radius: 7
+              radius: 6
             on_value:
               then:
                 - lambda: 'id(sweep_target_2) = (int)x;'
@@ -1169,29 +1158,27 @@ lvgl:
                     text:
                       format: "%d%%"
                       args: ['(int)x']
-
         - label:
             id: lbl_st2
             text: "80%"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFFFFFF
-            x: 232
-            y: 54
+            x: 184
+            y: 55
 
         # --- S3 Target ---
         - label:
             text: "S3"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0x888888
-            x: 5
-            y: 80
-
+            x: 22
+            y: 74
         - slider:
             id: slider_sweep_t3
-            x: 25
-            y: 80
-            width: 200
-            height: 14
+            x: 38
+            y: 74
+            width: 140
+            height: 12
             min_value: 0
             max_value: 100
             value: 80
@@ -1200,7 +1187,7 @@ lvgl:
               bg_color: 0xFFAB00
             knob:
               bg_color: 0xFFFFFF
-              radius: 7
+              radius: 6
             on_value:
               then:
                 - lambda: 'id(sweep_target_3) = (int)x;'
@@ -1209,37 +1196,29 @@ lvgl:
                     text:
                       format: "%d%%"
                       args: ['(int)x']
-
         - label:
             id: lbl_st3
             text: "80%"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFFFFFF
-            x: 232
-            y: 80
+            x: 184
+            y: 73
 
         # --- Duration ---
         - label:
-            text: "Duration:"
-            text_font: montserrat_12
-            text_color: 0x888888
-            x: 5
-            y: 108
-
-        - label:
             id: lbl_duration_val
             text: "1m"
-            text_font: montserrat_14
+            text_font: montserrat_12
             text_color: 0x00E676
-            x: 75
-            y: 106
+            align: TOP_MID
+            y: 92
 
         - buttonmatrix:
             id: btnm_duration
-            x: 5
-            y: 124
-            width: 310
-            height: 34
+            x: 25
+            y: 106
+            width: 190
+            height: 26
             rows:
               - buttons:
                   - id: btn_d_30s
@@ -1291,56 +1270,91 @@ lvgl:
                             id: lbl_duration_val
                             text: "1h"
 
-        # --- Direction ---
-        - label:
-            text: "Direction:"
-            text_font: montserrat_12
-            text_color: 0x888888
-            x: 5
-            y: 165
-
+        # --- Direction + Start row ---
         - button:
             id: btn_dir_up
-            x: 85
-            y: 162
-            width: 60
-            height: 28
+            x: 30
+            y: 140
+            width: 44
+            height: 24
             styles: style_btn
             widgets:
               - label:
                   text: "UP"
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0x0D0D0D
             on_click:
               then:
                 - lambda: 'id(sweep_direction_up) = true;'
-
         - button:
             id: btn_dir_down
-            x: 155
-            y: 162
-            width: 70
-            height: 28
+            x: 80
+            y: 140
+            width: 52
+            height: 24
             styles: style_btn_outline
             widgets:
               - label:
                   text: "DOWN"
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0x00E676
             on_click:
               then:
                 - lambda: 'id(sweep_direction_up) = false;'
-
-        # --- Bottom nav ---
         - button:
-            x: 5
-            y: 200
-            width: 90
-            height: 35
+            id: btn_start_sweep
+            x: 140
+            y: 140
+            width: 72
+            height: 24
+            styles: style_btn
+            widgets:
+              - label:
+                  text: "START>"
+                  text_font: montserrat_10
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: |-
+                    if (id(sweep_direction_up)) {
+                      id(sweep_start_1) = id(sim_moisture_1);
+                      id(sweep_start_2) = id(sim_moisture_2);
+                      id(sweep_start_3) = id(sim_moisture_3);
+                    } else {
+                      id(sweep_start_1) = id(sweep_target_1);
+                      id(sweep_start_2) = id(sweep_target_2);
+                      id(sweep_start_3) = id(sweep_target_3);
+                      id(sweep_target_1) = 0;
+                      id(sweep_target_2) = 0;
+                      id(sweep_target_3) = 0;
+                      id(sim_moisture_1) = id(sweep_start_1);
+                      id(sim_moisture_2) = id(sweep_start_2);
+                      id(sim_moisture_3) = id(sweep_start_3);
+                    }
+                    id(sweep_start_time) = millis();
+                    id(sweep_active) = true;
+                    lv_bar_set_value(id(bar_sweep_1), id(sim_moisture_1), LV_ANIM_OFF);
+                    lv_bar_set_value(id(bar_sweep_2), id(sim_moisture_2), LV_ANIM_OFF);
+                    lv_bar_set_value(id(bar_sweep_3), id(sim_moisture_3), LV_ANIM_OFF);
+                - lvgl.page.show:
+                    id: page_sweep_run
+                    animation: MOVE_LEFT
+                    time: 300ms
+
+        # --- Back ---
+        - button:
+            align: BOTTOM_MID
+            y: -20
+            width: 80
+            height: 26
             styles: style_btn_outline
             widgets:
               - label:
                   text: "< BACK"
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0x00E676
             on_click:
@@ -1350,170 +1364,117 @@ lvgl:
                     animation: MOVE_RIGHT
                     time: 300ms
 
-        - button:
-            id: btn_start_sweep
-            x: 220
-            y: 200
-            width: 95
-            height: 35
-            styles: style_btn
-            widgets:
-              - label:
-                  text: "START >"
-                  align: CENTER
-                  text_color: 0x0D0D0D
-            on_click:
-              then:
-                - lambda: |-
-                    // Capture start values
-                    if (id(sweep_direction_up)) {
-                      // UP: sweep from current slider values toward targets
-                      id(sweep_start_1) = id(sim_moisture_1);
-                      id(sweep_start_2) = id(sim_moisture_2);
-                      id(sweep_start_3) = id(sim_moisture_3);
-                    } else {
-                      // DOWN: sweep from targets toward 0
-                      id(sweep_start_1) = id(sweep_target_1);
-                      id(sweep_start_2) = id(sweep_target_2);
-                      id(sweep_start_3) = id(sweep_target_3);
-                      id(sweep_target_1) = 0;
-                      id(sweep_target_2) = 0;
-                      id(sweep_target_3) = 0;
-                      // Set current moisture to the start values
-                      id(sim_moisture_1) = id(sweep_start_1);
-                      id(sim_moisture_2) = id(sweep_start_2);
-                      id(sim_moisture_3) = id(sweep_start_3);
-                    }
-                    id(sweep_start_time) = millis();
-                    id(sweep_active) = true;
-
-                    // Initialize running page bars
-                    lv_bar_set_value(id(bar_sweep_1), id(sim_moisture_1), LV_ANIM_OFF);
-                    lv_bar_set_value(id(bar_sweep_2), id(sim_moisture_2), LV_ANIM_OFF);
-                    lv_bar_set_value(id(bar_sweep_3), id(sim_moisture_3), LV_ANIM_OFF);
-                - lvgl.page.show:
-                    id: page_sweep_run
-                    animation: MOVE_LEFT
-                    time: 300ms
-
     # ──────── PAGE: SWEEP RUNNING ────────
     - id: page_sweep_run
       bg_color: 0x0D0D0D
       widgets:
         - label:
-            text: "SWEEPING..."
-            text_font: montserrat_14
+            text: "SWEEPING"
+            text_font: montserrat_12
             text_color: 0x00E676
-            x: 10
-            y: 8
-
+            align: TOP_MID
+            y: 22
         - label:
             id: lbl_sweep_time
-            text: "0:00 left"
-            text_font: montserrat_14
+            text: "0:00"
+            text_font: montserrat_12
             text_color: 0xFFFFFF
-            align: TOP_RIGHT
-            x: -10
-            y: 8
+            align: TOP_MID
+            y: 38
 
         # --- S1 bar ---
         - label:
             text: "S1"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0x888888
-            x: 10
-            y: 40
-
+            x: 22
+            y: 58
         - bar:
             id: bar_sweep_1
-            x: 30
-            y: 40
-            width: 230
-            height: 16
+            x: 38
+            y: 58
+            width: 140
+            height: 12
             min_value: 0
             max_value: 100
             value: 0
             bg_color: 0x1A1A1A
             indicator:
               bg_color: 0x2979FF
-
         - label:
             id: lbl_sweep_val_1
             text: "0%"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFFFFFF
-            x: 270
-            y: 40
+            x: 184
+            y: 57
 
         # --- S2 bar ---
         - label:
             text: "S2"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0x888888
-            x: 10
-            y: 70
-
+            x: 22
+            y: 78
         - bar:
             id: bar_sweep_2
-            x: 30
-            y: 70
-            width: 230
-            height: 16
+            x: 38
+            y: 78
+            width: 140
+            height: 12
             min_value: 0
             max_value: 100
             value: 0
             bg_color: 0x1A1A1A
             indicator:
               bg_color: 0x00BFA5
-
         - label:
             id: lbl_sweep_val_2
             text: "0%"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFFFFFF
-            x: 270
-            y: 70
+            x: 184
+            y: 77
 
         # --- S3 bar ---
         - label:
             text: "S3"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0x888888
-            x: 10
-            y: 100
-
+            x: 22
+            y: 98
         - bar:
             id: bar_sweep_3
-            x: 30
-            y: 100
-            width: 230
-            height: 16
+            x: 38
+            y: 98
+            width: 140
+            height: 12
             min_value: 0
             max_value: 100
             value: 0
             bg_color: 0x1A1A1A
             indicator:
               bg_color: 0xFFAB00
-
         - label:
             id: lbl_sweep_val_3
             text: "0%"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFFFFFF
-            x: 270
-            y: 100
+            x: 184
+            y: 97
 
         # --- Cancel button ---
         - button:
             id: btn_cancel_sweep
             align: BOTTOM_MID
-            y: -15
-            width: 140
-            height: 45
+            y: -30
+            width: 100
+            height: 30
             styles: style_btn_red
             widgets:
               - label:
                   text: "CANCEL"
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0xFFFFFF
             on_click:
@@ -1529,32 +1490,25 @@ lvgl:
       bg_color: 0x0D0D0D
       widgets:
         - label:
-            text: "SIMULATION MODE"
-            text_font: montserrat_14
+            text: "SIM MODE"
+            text_font: montserrat_12
             text_color: 0x888888
             align: TOP_MID
-            y: 8
+            y: 28
 
         - button:
             id: btn_mode_sweep
-            x: 30
-            y: 40
-            width: 260
-            height: 55
+            align: CENTER
+            y: -20
+            width: 170
+            height: 40
             styles: style_btn_outline
             widgets:
               - label:
-                  text: "SWEEP MODE"
+                  text: "SWEEP"
                   text_font: montserrat_14
                   align: CENTER
-                  y: -8
                   text_color: 0x00E676
-              - label:
-                  text: "Linear ramp to targets"
-                  text_font: montserrat_12
-                  align: CENTER
-                  y: 10
-                  text_color: 0x888888
             on_click:
               then:
                 - lvgl.page.show:
@@ -1564,23 +1518,16 @@ lvgl:
 
         - button:
             id: btn_mode_rain
-            x: 30
-            y: 110
-            width: 260
-            height: 55
+            align: CENTER
+            y: 30
+            width: 170
+            height: 40
             styles: style_btn
             widgets:
               - label:
-                  text: "RAIN MODE"
+                  text: "RAIN"
                   text_font: montserrat_14
                   align: CENTER
-                  y: -8
-                  text_color: 0x0D0D0D
-              - label:
-                  text: "Soil percolation sim"
-                  text_font: montserrat_12
-                  align: CENTER
-                  y: 10
                   text_color: 0x0D0D0D
             on_click:
               then:
@@ -1590,14 +1537,15 @@ lvgl:
                     time: 300ms
 
         - button:
-            x: 110
-            y: 190
-            width: 100
-            height: 38
+            align: BOTTOM_MID
+            y: -28
+            width: 80
+            height: 26
             styles: style_btn_outline
             widgets:
               - label:
                   text: "< BACK"
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0x00E676
             on_click:
@@ -1613,72 +1561,57 @@ lvgl:
       widgets:
         - label:
             text: "RAIN SIM"
-            text_font: montserrat_14
+            text_font: montserrat_12
             text_color: 0x888888
-            x: 10
-            y: 4
+            align: TOP_MID
+            y: 18
 
         # Rain status indicator
         - label:
             id: lbl_rain_status
             text: "STOPPED"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFF3D00
-            align: TOP_RIGHT
-            x: -10
-            y: 4
+            align: TOP_MID
+            y: 34
 
         # --- Soil type selector ---
-        - label:
-            text: "Soil:"
-            text_font: montserrat_12
-            text_color: 0x888888
-            x: 5
-            y: 24
-
         - buttonmatrix:
             id: btnm_soil
-            x: 45
-            y: 20
-            width: 270
-            height: 28
+            x: 25
+            y: 48
+            width: 190
+            height: 24
             rows:
               - buttons:
                   - id: btn_sand
-                    text: "SAND"
+                    text: "SND"
                     on_value:
                       then:
                         - lambda: 'id(soil_type) = 0;'
                   - id: btn_loam
-                    text: "LOAM"
+                    text: "LOM"
                     on_value:
                       then:
                         - lambda: 'id(soil_type) = 1;'
                   - id: btn_clay
-                    text: "CLAY"
+                    text: "CLY"
                     on_value:
                       then:
                         - lambda: 'id(soil_type) = 2;'
                   - id: btn_silt
-                    text: "SILT"
+                    text: "SLT"
                     on_value:
                       then:
                         - lambda: 'id(soil_type) = 3;'
 
         # --- Precipitation rate selector ---
-        - label:
-            text: "Rain:"
-            text_font: montserrat_12
-            text_color: 0x888888
-            x: 5
-            y: 56
-
         - buttonmatrix:
             id: btnm_precip
-            x: 45
-            y: 52
-            width: 270
-            height: 28
+            x: 25
+            y: 76
+            width: 190
+            height: 24
             rows:
               - buttons:
                   - id: btn_drizzle
@@ -1702,20 +1635,19 @@ lvgl:
                       then:
                         - lambda: 'id(precip_rate) = 3;'
 
-        # --- Time factor: 1 week = X hours ---
+        # --- Time factor ---
         - label:
-            text: "1 wk ="
-            text_font: montserrat_12
+            text: "1wk="
+            text_font: montserrat_10
             text_color: 0x888888
-            x: 5
-            y: 88
-
+            x: 25
+            y: 106
         - slider:
             id: slider_time_factor
-            x: 60
-            y: 88
-            width: 190
-            height: 14
+            x: 55
+            y: 106
+            width: 120
+            height: 12
             min_value: 1
             max_value: 168
             value: 1
@@ -1724,124 +1656,113 @@ lvgl:
               bg_color: 0x00E676
             knob:
               bg_color: 0xFFFFFF
-              radius: 7
+              radius: 6
             on_value:
               then:
                 - lambda: |-
-                    // Time factor: how many real hours = 1 simulated week
-                    // 1 week = 168 hours real time at 1x
-                    // If slider=1, 1wk=1hr (168x speed)
-                    // If slider=168, 1wk=168hr (1x realtime)
                     id(time_factor) = 168.0f / x;
                 - lvgl.label.update:
                     id: lbl_time_factor
                     text:
                       format: "%dhr"
                       args: ['(int)x']
-
         - label:
             id: lbl_time_factor
             text: "1hr"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0x00E676
-            x: 260
-            y: 88
+            x: 182
+            y: 106
 
         # --- Live sensor bars ---
         - label:
-            text: "S3 SHALLOW"
+            text: "S3"
             text_font: montserrat_10
             text_color: 0x888888
-            x: 5
-            y: 112
-
+            x: 22
+            y: 124
         - bar:
             id: bar_rain_3
-            x: 5
+            x: 38
             y: 124
-            width: 255
-            height: 14
+            width: 140
+            height: 10
             min_value: 0
             max_value: 100
             value: 50
             bg_color: 0x1A1A1A
             indicator:
               bg_color: 0x2979FF
-
         - label:
             id: lbl_rain_val_3
             text: "50%"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFFFFFF
-            x: 268
+            x: 184
             y: 122
 
         - label:
-            text: "S2 MID"
+            text: "S2"
             text_font: montserrat_10
             text_color: 0x888888
-            x: 5
-            y: 142
-
+            x: 22
+            y: 140
         - bar:
             id: bar_rain_2
-            x: 5
-            y: 154
-            width: 255
-            height: 14
+            x: 38
+            y: 140
+            width: 140
+            height: 10
             min_value: 0
             max_value: 100
             value: 50
             bg_color: 0x1A1A1A
             indicator:
               bg_color: 0x00BFA5
-
         - label:
             id: lbl_rain_val_2
             text: "50%"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFFFFFF
-            x: 268
-            y: 152
+            x: 184
+            y: 138
 
         - label:
-            text: "S1 DEEP"
+            text: "S1"
             text_font: montserrat_10
             text_color: 0x888888
-            x: 5
-            y: 172
-
+            x: 22
+            y: 156
         - bar:
             id: bar_rain_1
-            x: 5
-            y: 184
-            width: 255
-            height: 14
+            x: 38
+            y: 156
+            width: 140
+            height: 10
             min_value: 0
             max_value: 100
             value: 50
             bg_color: 0x1A1A1A
             indicator:
               bg_color: 0xFFAB00
-
         - label:
             id: lbl_rain_val_1
             text: "50%"
-            text_font: montserrat_12
+            text_font: montserrat_10
             text_color: 0xFFFFFF
-            x: 268
-            y: 182
+            x: 184
+            y: 154
 
         # --- Bottom buttons ---
         - button:
-            x: 5
-            y: 205
-            width: 70
-            height: 30
+            x: 24
+            y: 174
+            width: 56
+            height: 24
             styles: style_btn_outline
             widgets:
               - label:
-                  text: "< BACK"
+                  text: "BACK"
                   text_font: montserrat_10
                   align: CENTER
                   text_color: 0x00E676
@@ -1855,22 +1776,21 @@ lvgl:
 
         - button:
             id: btn_start_rain
-            x: 85
-            y: 205
-            width: 110
-            height: 30
+            x: 88
+            y: 174
+            width: 64
+            height: 24
             styles: style_btn
             widgets:
               - label:
                   text: "START"
-                  text_font: montserrat_12
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0x0D0D0D
             on_click:
               then:
                 - lambda: |-
                     id(rain_active) = true;
-                    // Sync float state from current int values
                     id(sim_moisture_f1) = (float)id(sim_moisture_1);
                     id(sim_moisture_f2) = (float)id(sim_moisture_2);
                     id(sim_moisture_f3) = (float)id(sim_moisture_3);
@@ -1882,15 +1802,15 @@ lvgl:
 
         - button:
             id: btn_stop_rain
-            x: 205
-            y: 205
-            width: 110
-            height: 30
+            x: 160
+            y: 174
+            width: 56
+            height: 24
             styles: style_btn_red
             widgets:
               - label:
                   text: "STOP"
-                  text_font: montserrat_12
+                  text_font: montserrat_10
                   align: CENTER
                   text_color: 0xFFFFFF
             on_click:
