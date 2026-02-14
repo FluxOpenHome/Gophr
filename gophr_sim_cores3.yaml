@@ -25,7 +25,7 @@ esphome:
       - lvgl.page.show:
           id: page_splash
           animation: NONE
-      - delay: 3s
+      - delay: 5s
       - lvgl.page.show:
           id: page_main
           animation: FADE_IN
@@ -35,6 +35,65 @@ esphome:
       - lambda: |-
           id(device_awake) = true;
           id(status_led_state) = true;
+      - delay: 500ms
+      - lambda: |-
+          // Create per-page focus groups for encoder navigation
+          lv_group_t *gm = lv_group_create();
+          lv_group_t *gs = lv_group_create();
+          lv_group_t *gr = lv_group_create();
+          lv_group_t *gx = lv_group_create();
+          lv_group_t *gn = lv_group_create();
+
+          // page_main (S3 top, S2 mid, S1 bottom)
+          lv_group_add_obj(gm, id(slider_m3));
+          lv_group_add_obj(gm, id(slider_m2));
+          lv_group_add_obj(gm, id(slider_m1));
+          lv_group_add_obj(gm, id(btn_send));
+          lv_group_add_obj(gm, id(btn_goto_sim));
+          lv_group_add_obj(gm, id(btn_sleep_toggle));
+
+          // page_sweep_cfg
+          lv_group_add_obj(gs, id(slider_sweep_t1));
+          lv_group_add_obj(gs, id(slider_sweep_t2));
+          lv_group_add_obj(gs, id(slider_sweep_t3));
+          lv_group_add_obj(gs, id(btnm_duration));
+          lv_group_add_obj(gs, id(btn_dir_up));
+          lv_group_add_obj(gs, id(btn_dir_down));
+          lv_group_add_obj(gs, id(btn_start_sweep));
+          lv_group_add_obj(gs, id(btn_back_sweep_cfg));
+
+          // page_sweep_run
+          lv_group_add_obj(gr, id(btn_cancel_sweep));
+
+          // page_sim_select
+          lv_group_add_obj(gx, id(btn_mode_sweep));
+          lv_group_add_obj(gx, id(btn_mode_rain));
+          lv_group_add_obj(gx, id(btn_back_sim_select));
+
+          // page_rain
+          lv_group_add_obj(gn, id(btnm_soil));
+          lv_group_add_obj(gn, id(btnm_precip));
+          lv_group_add_obj(gn, id(slider_time_factor));
+          lv_group_add_obj(gn, id(btn_start_rain));
+          lv_group_add_obj(gn, id(btn_stop_rain));
+          lv_group_add_obj(gn, id(btn_back_rain));
+
+          // Store group pointers
+          id(grp_main) = (void*)gm;
+          id(grp_sweep_cfg) = (void*)gs;
+          id(grp_sweep_run) = (void*)gr;
+          id(grp_sim_select) = (void*)gx;
+          id(grp_rain) = (void*)gn;
+
+          // Find encoder indev and assign initial group
+          lv_indev_t *enc = nullptr;
+          while ((enc = lv_indev_get_next(enc)) != nullptr) {
+            if (lv_indev_get_type(enc) == LV_INDEV_TYPE_ENCODER) {
+              id(enc_indev) = (void*)enc;
+              lv_indev_set_group(enc, gm);
+              break;
+            }
+          }
 
 esp32:
   variant: esp32s3
@@ -213,6 +272,10 @@ globals:
     type: bool
     restore_value: no
     initial_value: 'false'
+  - id: rain_ever_started
+    type: bool
+    restore_value: no
+    initial_value: 'false'
   - id: soil_type
     type: int
     restore_value: no
@@ -269,6 +332,31 @@ globals:
     type: int
     restore_value: true
     initial_value: '60'
+  # Encoder focus groups (per-page, to avoid multi-page focus bug)
+  - id: enc_indev
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
+  - id: grp_main
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
+  - id: grp_sweep_cfg
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
+  - id: grp_sweep_run
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
+  - id: grp_sim_select
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
+  - id: grp_rain
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
   - id: sleep_sequence_active
     type: bool
     restore_value: no
@@ -432,6 +520,21 @@ sensor:
       return 2.046f - pct * (2.046f - 1.391f);
     update_interval: 5s
 
+  # --- Rotary Encoder (M5 Dial) ---
+  - platform: rotary_encoder
+    id: dial_encoder
+    resolution: 1
+    pin_a:
+      number: GPIO40
+      mode:
+        input: true
+        pullup: true
+    pin_b:
+      number: GPIO41
+      mode:
+        input: true
+        pullup: true
+
 # ──────────────────────────────────────────────
 # Binary Sensors (matching real device)
 # ──────────────────────────────────────────────
@@ -459,6 +562,16 @@ binary_sensor:
     name: "Device Awake"
     id: device_awake_bin
     lambda: 'return id(device_awake);'
+
+  # --- Dial Front Button (M5 Dial) ---
+  - platform: gpio
+    id: dial_button
+    pin:
+      number: GPIO42
+      mode:
+        input: true
+        pullup: true
+      inverted: true
 
 # ──────────────────────────────────────────────
 # Controls (matching real device)
@@ -645,6 +758,8 @@ interval:
           }
 
           // --- Rain percolation simulation ---
+          // Only runs after user explicitly starts rain sim
+          if (id(rain_ever_started)) {
           // Soil params: {infiltration, percolation, retention, drain}
           static const float soil_params[4][4] = {
             {8.0f, 6.0f, 20.0f, 1.5f},  // 0: Sand
@@ -751,10 +866,11 @@ interval:
             lv_label_set_text(id(lbl_m3_val), mb);
           }
 
-          // Publish to HA
+          // Publish to HA (rain sim values)
           id(moisture_1_percent).publish_state(id(sim_moisture_1));
           id(moisture_2_percent).publish_state(id(sim_moisture_2));
           id(moisture_3_percent).publish_state(id(sim_moisture_3));
+          } // end rain_ever_started guard
 
           // --- Sleep wake-up timer ---
           if (id(sleep_sequence_active)) {
@@ -785,10 +901,30 @@ lvgl:
     - dial_lcd
   touchscreens:
     - touchscreen_id: touch
+  encoders:
+    - sensor: dial_encoder
+      enter_button: dial_button
   color_depth: 16
   buffer_size: 10%
   default_font: montserrat_14
   disp_bg_color: 0x0D0D0D
+
+  theme:
+    button:
+      focused:
+        border_color: 0xFFFFFF
+        border_width: 2
+    slider:
+      focused:
+        border_color: 0xFFFFFF
+        border_width: 2
+      knob:
+        edited:
+          bg_color: 0xFF3D00
+    buttonmatrix:
+      focused:
+        border_color: 0xFFFFFF
+        border_width: 2
 
   style_definitions:
     - id: style_btn
@@ -841,6 +977,11 @@ lvgl:
     # ──────── PAGE: MAIN ────────
     - id: page_main
       bg_color: 0x0D0D0D
+      on_load:
+        then:
+          - lambda: |-
+              if (id(enc_indev) != nullptr)
+                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_main));
       widgets:
         # Title row
         - label:
@@ -867,15 +1008,15 @@ lvgl:
             x: -30
             y: 36
 
-        # --- Sensor 1: SHALLOW ---
+        # --- Sensor 3: SHALLOW (top) ---
         - label:
-            text: "S1"
+            text: "S3"
             text_font: montserrat_10
-            text_color: 0x2979FF
+            text_color: 0xFFAB00
             x: 22
             y: 52
         - slider:
-            id: slider_m1
+            id: slider_m3
             x: 38
             y: 52
             width: 140
@@ -885,7 +1026,7 @@ lvgl:
             value: 50
             bg_color: 0x1A1A1A
             indicator:
-              bg_color: 0x2979FF
+              bg_color: 0xFFAB00
             knob:
               bg_color: 0xFFFFFF
               radius: 7
@@ -893,21 +1034,21 @@ lvgl:
               height: 14
             on_value:
               then:
-                - lambda: 'id(sim_moisture_1) = (int)x;'
+                - lambda: 'id(sim_moisture_3) = (int)x;'
                 - lvgl.label.update:
-                    id: lbl_m1_val
+                    id: lbl_m3_val
                     text:
                       format: "%d%%"
                       args: ['(int)x']
         - label:
-            id: lbl_m1_val
+            id: lbl_m3_val
             text: "50%"
             text_font: montserrat_12
             text_color: 0xFFFFFF
             x: 184
             y: 51
 
-        # --- Sensor 2: MID ---
+        # --- Sensor 2: MID (middle) ---
         - label:
             text: "S2"
             text_font: montserrat_10
@@ -947,15 +1088,15 @@ lvgl:
             x: 184
             y: 73
 
-        # --- Sensor 3: DEEP ---
+        # --- Sensor 1: DEEP (bottom) ---
         - label:
-            text: "S3"
+            text: "S1"
             text_font: montserrat_10
-            text_color: 0xFFAB00
+            text_color: 0x2979FF
             x: 22
             y: 96
         - slider:
-            id: slider_m3
+            id: slider_m1
             x: 38
             y: 96
             width: 140
@@ -965,7 +1106,7 @@ lvgl:
             value: 50
             bg_color: 0x1A1A1A
             indicator:
-              bg_color: 0xFFAB00
+              bg_color: 0x2979FF
             knob:
               bg_color: 0xFFFFFF
               radius: 7
@@ -973,19 +1114,29 @@ lvgl:
               height: 14
             on_value:
               then:
-                - lambda: 'id(sim_moisture_3) = (int)x;'
+                - lambda: 'id(sim_moisture_1) = (int)x;'
                 - lvgl.label.update:
-                    id: lbl_m3_val
+                    id: lbl_m1_val
                     text:
                       format: "%d%%"
                       args: ['(int)x']
         - label:
-            id: lbl_m3_val
+            id: lbl_m1_val
             text: "50%"
             text_font: montserrat_12
             text_color: 0xFFFFFF
             x: 184
             y: 95
+
+        # --- Send confirmation label (hidden by default) ---
+        - label:
+            id: lbl_send_confirm
+            text: "SENT!"
+            text_font: montserrat_12
+            text_color: 0x00E676
+            align: BOTTOM_MID
+            y: -18
+            hidden: true
 
         # --- Bottom buttons ---
         - button:
@@ -1007,6 +1158,9 @@ lvgl:
                     id(moisture_1_percent).publish_state(id(sim_moisture_1));
                     id(moisture_2_percent).publish_state(id(sim_moisture_2));
                     id(moisture_3_percent).publish_state(id(sim_moisture_3));
+                - lvgl.widget.show: lbl_send_confirm
+                - delay: 1500ms
+                - lvgl.widget.hide: lbl_send_confirm
 
         - button:
             id: btn_goto_sim
@@ -1082,6 +1236,11 @@ lvgl:
     # ──────── PAGE: SWEEP CONFIG ────────
     - id: page_sweep_cfg
       bg_color: 0x0D0D0D
+      on_load:
+        then:
+          - lambda: |-
+              if (id(enc_indev) != nullptr)
+                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_sweep_cfg));
       widgets:
         - label:
             text: "SWEEP CFG"
@@ -1336,6 +1495,9 @@ lvgl:
                     }
                     id(sweep_start_time) = millis();
                     id(sweep_active) = true;
+                    // Cancel rain sim if running
+                    id(rain_active) = false;
+                    id(rain_ever_started) = false;
                     lv_bar_set_value(id(bar_sweep_1), id(sim_moisture_1), LV_ANIM_OFF);
                     lv_bar_set_value(id(bar_sweep_2), id(sim_moisture_2), LV_ANIM_OFF);
                     lv_bar_set_value(id(bar_sweep_3), id(sim_moisture_3), LV_ANIM_OFF);
@@ -1346,6 +1508,7 @@ lvgl:
 
         # --- Back ---
         - button:
+            id: btn_back_sweep_cfg
             align: BOTTOM_MID
             y: -20
             width: 80
@@ -1367,6 +1530,11 @@ lvgl:
     # ──────── PAGE: SWEEP RUNNING ────────
     - id: page_sweep_run
       bg_color: 0x0D0D0D
+      on_load:
+        then:
+          - lambda: |-
+              if (id(enc_indev) != nullptr)
+                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_sweep_run));
       widgets:
         - label:
             text: "SWEEPING"
@@ -1488,6 +1656,11 @@ lvgl:
     # ──────── PAGE: SIM MODE SELECT ────────
     - id: page_sim_select
       bg_color: 0x0D0D0D
+      on_load:
+        then:
+          - lambda: |-
+              if (id(enc_indev) != nullptr)
+                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_sim_select));
       widgets:
         - label:
             text: "SIM MODE"
@@ -1537,6 +1710,7 @@ lvgl:
                     time: 300ms
 
         - button:
+            id: btn_back_sim_select
             align: BOTTOM_MID
             y: -28
             width: 80
@@ -1558,6 +1732,11 @@ lvgl:
     # ──────── PAGE: RAIN SIMULATION ────────
     - id: page_rain
       bg_color: 0x0D0D0D
+      on_load:
+        then:
+          - lambda: |-
+              if (id(enc_indev) != nullptr)
+                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_rain));
       widgets:
         - label:
             text: "RAIN SIM"
@@ -1755,6 +1934,7 @@ lvgl:
 
         # --- Bottom buttons ---
         - button:
+            id: btn_back_rain
             x: 24
             y: 174
             width: 56
@@ -1768,7 +1948,9 @@ lvgl:
                   text_color: 0x00E676
             on_click:
               then:
-                - lambda: 'id(rain_active) = false;'
+                - lambda: |-
+                    id(rain_active) = false;
+                    id(rain_ever_started) = false;
                 - lvgl.page.show:
                     id: page_sim_select
                     animation: MOVE_RIGHT
@@ -1791,6 +1973,9 @@ lvgl:
               then:
                 - lambda: |-
                     id(rain_active) = true;
+                    id(rain_ever_started) = true;
+                    // Cancel sweep if running
+                    id(sweep_active) = false;
                     id(sim_moisture_f1) = (float)id(sim_moisture_1);
                     id(sim_moisture_f2) = (float)id(sim_moisture_2);
                     id(sim_moisture_f3) = (float)id(sim_moisture_3);
