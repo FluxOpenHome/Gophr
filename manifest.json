@@ -1,0 +1,15 @@
+{
+  "name": "Gophr Simulator",
+  "version": "1.4.3-sim",
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "ota": {
+        "md5": "",
+        "path": "https://github.com/FluxOpenHome/Gophr/releases/download/gophr-sim-v1.4.3-sim/gophr-sim-1.4.3-sim.ota.bin",
+        "release_url": "https://github.com/FluxOpenHome/Gophr/releases/tag/gophr-sim-v1.4.3-sim",
+        "summary": "Update 1.4.3-sim"
+      }
+    }
+  ]
+}

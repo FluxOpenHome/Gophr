@@ -88,17 +88,52 @@ jobs:
             [ -f "$file" ] && cp "$file" "firmware/${NAME}-${VERSION}.factory.bin"
           done
 
+          # Generate MD5 hash for OTA bin
+          for file in output/*.ota.bin; do
+            [ -f "$file" ] && md5sum "$file" | awk '{print $1}' > "${file}.md5"
+          done
+
           echo "Release files:"
           ls -la output/
           echo "Repo files:"
           ls -la firmware/
 
-      - name: Commit factory bin to repo
+      - name: Update manifest.json
+        if: steps.esphome-build.outcome == 'success'
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          NAME="${{ matrix.device.name }}"
+          TAG="${NAME}-v${VERSION}"
+          MD5=$(cat output/${NAME}-${VERSION}.ota.bin.md5)
+
+          cat > manifest.json << EOF
+          {
+            "name": "Gophr Simulator",
+            "version": "${VERSION}",
+            "builds": [
+              {
+                "chipFamily": "ESP32-S3",
+                "ota": {
+                  "md5": "${MD5}",
+                  "path": "https://github.com/FluxOpenHome/Gophr/releases/download/${TAG}/${NAME}-${VERSION}.ota.bin",
+                  "release_url": "https://github.com/FluxOpenHome/Gophr/releases/tag/${TAG}",
+                  "summary": "Update ${VERSION}"
+                }
+              }
+            ]
+          }
+          EOF
+          # Remove leading whitespace from heredoc
+          sed -i 's/^          //' manifest.json
+          echo "Updated manifest.json:"
+          cat manifest.json
+
+      - name: Commit factory bin and manifest to repo
         if: steps.esphome-build.outcome == 'success'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add firmware/
+          git add firmware/ manifest.json
           git diff --cached --quiet || git commit -m "Build: ${NAME} factory bin v${VERSION}
 
           Auto-built from ${{ github.sha }}"
@@ -113,7 +148,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.device.name }}-firmware
-          path: output/*.bin
+          path: |
+            output/*.bin
+            output/*.md5
 
       - name: Create GitHub Release
         if: steps.esphome-build.outcome == 'success'
@@ -130,6 +167,9 @@ jobs:
 
             **Files:**
             - `.ota.bin` — OTA update (in release)
+            - `.ota.bin.md5` — MD5 checksum for OTA bin
             - `.factory.bin` — Full flash (in `firmware/` folder)
-          files: output/*.ota.bin
+          files: |
+            output/*.ota.bin
+            output/*.ota.bin.md5
           make_latest: true
