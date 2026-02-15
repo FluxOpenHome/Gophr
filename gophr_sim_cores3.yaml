@@ -5,7 +5,7 @@
 substitutions:
   name: "gophr"
   friendly_name: "Gophr"
-  software_version: "1.4.1-sim"
+  software_version: "1.4.3-sim"
 
 esphome:
   name: "${name}"
@@ -27,6 +27,7 @@ esphome:
           lv_group_t *gn = lv_group_create();
           lv_group_t *gps = lv_group_create();
           lv_group_t *gpp = lv_group_create();
+          lv_group_t *gsd = lv_group_create();
 
           // page_main (S3 top, S2 mid, S1 bottom)
           lv_group_add_obj(gm, id(slider_m3));
@@ -35,6 +36,7 @@ esphome:
           lv_group_add_obj(gm, id(btn_send));
           lv_group_add_obj(gm, id(btn_goto_sim));
           lv_group_add_obj(gm, id(btn_sleep_toggle));
+          lv_group_add_obj(gm, id(btn_sleep_dur));
 
           // page_sim_select
           lv_group_add_obj(gx, id(btn_mode_rain));
@@ -60,12 +62,18 @@ esphome:
           lv_group_add_obj(gpp, id(btn_sel_heavy));
           lv_group_add_obj(gpp, id(btn_sel_downpour));
 
+          // page_pick_sleep
+          lv_group_add_obj(gsd, id(slider_sleep_dur));
+          lv_group_add_obj(gsd, id(btn_sleep_dur_ok));
+          lv_group_add_obj(gsd, id(btn_sleep_dur_cancel));
+
           // Store group pointers
           id(grp_main) = (void*)gm;
           id(grp_sim_select) = (void*)gx;
           id(grp_rain) = (void*)gn;
           id(grp_pick_soil) = (void*)gps;
           id(grp_pick_precip) = (void*)gpp;
+          id(grp_pick_sleep) = (void*)gsd;
 
           // Find encoder indev and assign initial group
           lv_indev_t *enc = nullptr;
@@ -154,6 +162,11 @@ output:
   - platform: ledc
     pin: GPIO9
     id: lcd_backlight_output
+    channel: 0
+  - platform: ledc
+    pin: GPIO3
+    id: buzzer_output
+    channel: 2
   # Virtual output for the Status LED light entity
   - platform: template
     type: binary
@@ -199,6 +212,12 @@ light:
     id: status_led
     output: status_led_output
     restore_mode: RESTORE_DEFAULT_ON
+
+# Buzzer (passive, GPIO3)
+rtttl:
+  output: buzzer_output
+  id: buzzer
+  gain: 30%
 
 # ──────────────────────────────────────────────
 # Globals
@@ -310,6 +329,10 @@ globals:
     restore_value: no
     initial_value: 'nullptr'
   - id: grp_pick_precip
+    type: void*
+    restore_value: no
+    initial_value: 'nullptr'
+  - id: grp_pick_sleep
     type: void*
     restore_value: no
     initial_value: 'nullptr'
@@ -551,6 +574,10 @@ number:
       - lambda: |-
           if (x >= 1 && x <= 1440) {
             id(sleep_duration_minutes) = (int)x;
+            // Update main page label
+            char buf[16];
+            snprintf(buf, sizeof(buf), "Sleep: %d min", (int)x);
+            lv_label_set_text(id(lbl_sleep_dur), buf);
           }
 
   - platform: template
@@ -962,6 +989,9 @@ lvgl:
               radius: 7
               width: 14
               height: 14
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             on_value:
               then:
                 - lambda: 'id(sim_moisture_3) = (int)x;'
@@ -1002,6 +1032,9 @@ lvgl:
               radius: 7
               width: 14
               height: 14
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             on_value:
               then:
                 - lambda: 'id(sim_moisture_2) = (int)x;'
@@ -1042,6 +1075,9 @@ lvgl:
               radius: 7
               width: 14
               height: 14
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             on_value:
               then:
                 - lambda: 'id(sim_moisture_1) = (int)x;'
@@ -1057,6 +1093,33 @@ lvgl:
             text_color: 0xFFFFFF
             x: 184
             y: 95
+
+        # --- Sleep duration display (clickable) ---
+        - button:
+            id: btn_sleep_dur
+            align: TOP_MID
+            y: 156
+            width: 120
+            height: 22
+            bg_color: 0x1A1A1A
+            border_width: 1
+            border_color: 0x444444
+            radius: 6
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
+            widgets:
+              - label:
+                  id: lbl_sleep_dur
+                  text: "Sleep: 60 min"
+                  text_font: montserrat_10
+                  align: CENTER
+                  text_color: 0x888888
+            on_click:
+              then:
+                - lvgl.page.show:
+                    id: page_pick_sleep
+                    animation: NONE
 
         # --- WiFi status indicator (bottom) ---
         - label:
@@ -1085,6 +1148,9 @@ lvgl:
             width: 60
             height: 32
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "SEND"
@@ -1108,6 +1174,9 @@ lvgl:
             width: 64
             height: 32
             styles: style_btn_outline
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "SIM >"
@@ -1127,6 +1196,9 @@ lvgl:
             width: 64
             height: 32
             styles: style_btn_outline
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   id: lbl_sleep_btn
@@ -1196,6 +1268,9 @@ lvgl:
             width: 170
             height: 40
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "RAIN"
@@ -1215,6 +1290,9 @@ lvgl:
             width: 80
             height: 26
             styles: style_btn_outline
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "< BACK"
@@ -1236,6 +1314,17 @@ lvgl:
           - lambda: |-
               if (id(enc_indev) != nullptr)
                 lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_rain));
+              // Sync rain bars to current main page slider values
+              lv_bar_set_value(id(bar_rain_3), id(sim_moisture_3), LV_ANIM_OFF);
+              lv_bar_set_value(id(bar_rain_2), id(sim_moisture_2), LV_ANIM_OFF);
+              lv_bar_set_value(id(bar_rain_1), id(sim_moisture_1), LV_ANIM_OFF);
+              char rb[8];
+              snprintf(rb, sizeof(rb), "%d%%", id(sim_moisture_3));
+              lv_label_set_text(id(lbl_rain_val_3), rb);
+              snprintf(rb, sizeof(rb), "%d%%", id(sim_moisture_2));
+              lv_label_set_text(id(lbl_rain_val_2), rb);
+              snprintf(rb, sizeof(rb), "%d%%", id(sim_moisture_1));
+              lv_label_set_text(id(lbl_rain_val_1), rb);
       widgets:
         - label:
             text: "RAIN SIM"
@@ -1267,6 +1356,9 @@ lvgl:
             width: 80
             height: 24
             styles: style_btn_outline
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   id: lbl_soil_val
@@ -1294,6 +1386,9 @@ lvgl:
             width: 80
             height: 24
             styles: style_btn_outline
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   id: lbl_precip_val
@@ -1329,6 +1424,9 @@ lvgl:
             knob:
               bg_color: 0xFFFFFF
               radius: 6
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             on_value:
               then:
                 - lambda: |-
@@ -1433,6 +1531,9 @@ lvgl:
             width: 56
             height: 24
             styles: style_btn_outline
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "BACK"
@@ -1455,6 +1556,9 @@ lvgl:
             width: 64
             height: 24
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "START"
@@ -1482,6 +1586,9 @@ lvgl:
             width: 56
             height: 24
             styles: style_btn_red
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "STOP"
@@ -1490,12 +1597,18 @@ lvgl:
                   text_color: 0xFFFFFF
             on_click:
               then:
-                - lambda: 'id(rain_active) = false;'
-                - lvgl.label.update:
-                    id: lbl_rain_status
-                    text: "DRYING"
                 - lambda: |-
-                    lv_obj_set_style_text_color(id(lbl_rain_status), lv_color_hex(0xFFAB00), 0);
+                    if (id(rain_active)) {
+                      // First press: stop rain, enter drying mode
+                      id(rain_active) = false;
+                      lv_label_set_text(id(lbl_rain_status), "DRYING");
+                      lv_obj_set_style_text_color(id(lbl_rain_status), lv_color_hex(0xFFAB00), 0);
+                    } else if (id(rain_ever_started)) {
+                      // Second press: fully exit simulation
+                      id(rain_ever_started) = false;
+                      lv_label_set_text(id(lbl_rain_status), "STOPPED");
+                      lv_obj_set_style_text_color(id(lbl_rain_status), lv_color_hex(0xFF3D00), 0);
+                    }
 
     # ──────── PAGE: PICK SOIL TYPE ────────
     - id: page_pick_soil
@@ -1520,6 +1633,9 @@ lvgl:
             width: 140
             height: 30
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "Sand"
@@ -1542,6 +1658,9 @@ lvgl:
             width: 140
             height: 30
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "Loam"
@@ -1564,6 +1683,9 @@ lvgl:
             width: 140
             height: 30
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "Clay"
@@ -1586,6 +1708,9 @@ lvgl:
             width: 140
             height: 30
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "Silt"
@@ -1625,6 +1750,9 @@ lvgl:
             width: 140
             height: 30
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "Drizzle"
@@ -1647,6 +1775,9 @@ lvgl:
             width: 140
             height: 30
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "Rain"
@@ -1669,6 +1800,9 @@ lvgl:
             width: 140
             height: 30
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "Heavy"
@@ -1691,6 +1825,9 @@ lvgl:
             width: 140
             height: 30
             styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
             widgets:
               - label:
                   text: "Downpour"
@@ -1705,5 +1842,116 @@ lvgl:
                     text: "Downpour"
                 - lvgl.page.show:
                     id: page_rain
+                    animation: NONE
+
+    # ──────── PAGE: SLEEP DURATION PICKER ────────
+    - id: page_pick_sleep
+      bg_color: 0x0D0D0D
+      bg_opa: COVER
+      on_load:
+        then:
+          - lambda: |-
+              if (id(enc_indev) != nullptr)
+                lv_indev_set_group((lv_indev_t*)id(enc_indev), (lv_group_t*)id(grp_pick_sleep));
+              // Set slider to current value
+              lv_slider_set_value(id(slider_sleep_dur), id(sleep_duration_minutes), LV_ANIM_OFF);
+              char buf[16];
+              snprintf(buf, sizeof(buf), "%d min", id(sleep_duration_minutes));
+              lv_label_set_text(id(lbl_sleep_dur_pick), buf);
+      widgets:
+        - label:
+            text: "SLEEP DURATION"
+            text_font: montserrat_14
+            text_color: 0x888888
+            align: TOP_MID
+            y: 30
+        - label:
+            id: lbl_sleep_dur_pick
+            text: "60 min"
+            text_font: montserrat_28
+            text_color: 0x00E676
+            align: CENTER
+            y: -20
+        - slider:
+            id: slider_sleep_dur
+            align: CENTER
+            y: 20
+            width: 160
+            height: 14
+            min_value: 1
+            max_value: 120
+            value: 60
+            bg_color: 0x1A1A1A
+            indicator:
+              bg_color: 0x00E676
+            knob:
+              bg_color: 0xFFFFFF
+              radius: 7
+              width: 14
+              height: 14
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
+            on_value:
+              then:
+                - lvgl.label.update:
+                    id: lbl_sleep_dur_pick
+                    text:
+                      format: "%d min"
+                      args: ['(int)x']
+        - button:
+            id: btn_sleep_dur_ok
+            align: BOTTOM_MID
+            x: -50
+            y: -30
+            width: 80
+            height: 30
+            styles: style_btn
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
+            widgets:
+              - label:
+                  text: "OK"
+                  text_font: montserrat_14
+                  align: CENTER
+                  text_color: 0x0D0D0D
+            on_click:
+              then:
+                - lambda: |-
+                    int val = lv_slider_get_value(id(slider_sleep_dur));
+                    id(sleep_duration_minutes) = val;
+                    // Update the HA number entity too
+                    auto call = id(sleep_duration_input).make_call();
+                    call.set_value(val);
+                    call.perform();
+                    // Update main page label
+                    char buf[16];
+                    snprintf(buf, sizeof(buf), "Sleep: %d min", val);
+                    lv_label_set_text(id(lbl_sleep_dur), buf);
+                - lvgl.page.show:
+                    id: page_main
+                    animation: NONE
+        - button:
+            id: btn_sleep_dur_cancel
+            align: BOTTOM_MID
+            x: 50
+            y: -30
+            width: 80
+            height: 30
+            styles: style_btn_outline
+            on_focus:
+              then:
+                - rtttl.play: "c:d=32,o=6,b=200:c"
+            widgets:
+              - label:
+                  text: "CANCEL"
+                  text_font: montserrat_10
+                  align: CENTER
+                  text_color: 0x00E676
+            on_click:
+              then:
+                - lvgl.page.show:
+                    id: page_main
                     animation: NONE
 
