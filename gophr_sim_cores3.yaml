@@ -5,7 +5,7 @@
 substitutions:
   name: "gophr"
   friendly_name: "Gophr"
-  software_version: "1.4.3-sim"
+  software_version: "1.4.4-sim"
 
 esphome:
   name: "${name}"
@@ -107,6 +107,11 @@ esp32:
   flash_size: 8MB
   framework:
     type: esp-idf
+    sdkconfig_options:
+      CONFIG_MBEDTLS_CERTIFICATE_BUNDLE: "y"
+      CONFIG_MBEDTLS_CERTIFICATE_BUNDLE_DEFAULT_FULL: "y"
+      CONFIG_HTTP_BUF_SIZE: "16384"
+      CONFIG_ESP_HTTP_CLIENT_ENABLE_HTTPS: "y"
 
 logger:
   level: DEBUG
@@ -115,7 +120,24 @@ api:
   id: api_server
 
 ota:
-  - platform: esphome
+  - id: ota_component
+    platform: esphome
+  - id: ota_http_request
+    platform: http_request
+
+http_request:
+  id: http_request_component
+  buffer_size_rx: 8192
+  buffer_size_tx: 4096
+  follow_redirects: true
+  timeout: 30s
+  verify_ssl: true
+
+update:
+  - platform: http_request
+    id: firmware_update
+    name: "Firmware Update"
+    source: https://raw.githubusercontent.com/FluxOpenHome/Gophr/main/manifest.json
 
 wifi:
   id: wifi_component
@@ -140,6 +162,12 @@ captive_portal:
 
 esp32_improv:
   authorizer: none
+
+improv_serial:
+
+dashboard_import:
+  package_import_url: github://FluxOpenHome/Gophr/gophr_sim_cores3.yaml@main
+  import_full_config: true
 
 web_server:
   port: 80
