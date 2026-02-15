@@ -5,7 +5,7 @@
 substitutions:
   name: "gophr"
   friendly_name: "Gophr"
-  software_version: "1.4.4-sim"
+  software_version: "1.4.5-sim"
 
 esphome:
   name: "${name}"
@@ -97,9 +97,10 @@ esphome:
       - light.turn_on:
           id: status_led
       - lambda: |-
+          // Boot: LED on, device awake, but awake timer starts on WiFi connect
           id(device_awake) = true;
           id(status_led_state) = true;
-          id(awake_start_time) = millis();
+          id(awake_start_time) = 0;
 
 esp32:
   variant: esp32s3
@@ -146,6 +147,10 @@ wifi:
   on_connect:
     - lambda: |-
         id(wifi_sta_connected) = true;
+        // WiFi connected: start the 2-minute awake countdown
+        if (id(device_awake) && id(awake_start_time) == 0) {
+          id(awake_start_time) = millis();
+        }
     - lvgl.label.update:
         id: lbl_wifi_status
         text: "WiFi: ON"
@@ -482,8 +487,8 @@ sensor:
     name: "Time Awake"
     id: time_awake_sensor
     lambda: |-
-      if (!id(device_awake)) return 0.0f;
-      unsigned long awake_ms = millis();
+      if (!id(device_awake) || id(awake_start_time) == 0) return 0.0f;
+      unsigned long awake_ms = millis() - id(awake_start_time);
       return awake_ms / (60.0f * 1000.0f);
     unit_of_measurement: "min"
     accuracy_decimals: 0
@@ -644,9 +649,29 @@ switch:
     entity_category: "config"
     lambda: 'return id(sleep_disabled);'
     turn_on_action:
-      - lambda: 'id(sleep_disabled) = true;'
+      - lambda: |-
+          id(sleep_disabled) = true;
+          // If currently sleeping, wake up immediately
+          if (!id(device_awake)) {
+            id(device_awake) = true;
+            id(sleep_sequence_active) = false;
+            id(status_led_state) = true;
+            id(awake_start_time) = 0;
+            auto call = id(status_led).turn_on();
+            call.perform();
+            lv_label_set_text(id(lbl_awake_status), "AWAKE");
+            lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0x00E676), 0);
+            lv_label_set_text(id(lbl_sleep_btn), "SLEEP");
+            lv_label_set_text(id(lbl_led_status), "LED: ON");
+            lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0x00E676), 0);
+          }
     turn_off_action:
-      - lambda: 'id(sleep_disabled) = false;'
+      - lambda: |-
+          id(sleep_disabled) = false;
+          // Re-enable sleep cycle: start 2-min awake timer if currently awake
+          if (id(device_awake)) {
+            id(awake_start_time) = millis();
+          }
 
 button:
   - platform: template
@@ -655,12 +680,19 @@ button:
     icon: "mdi:power-sleep"
     on_press:
       - lambda: |-
-          // Simulate going to sleep
+          // Simulate going to sleep: LED off, start sleep_duration countdown
           id(device_awake) = false;
           id(sleep_sequence_active) = true;
           id(sleep_sequence_start_time) = millis();
-      - light.turn_off:
-          id: status_led
+          id(awake_start_time) = 0;
+          id(status_led_state) = false;
+          auto call = id(status_led).turn_off();
+          call.perform();
+          lv_label_set_text(id(lbl_awake_status), "SLEEPING");
+          lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0xFF3D00), 0);
+          lv_label_set_text(id(lbl_sleep_btn), "WAKE");
+          lv_label_set_text(id(lbl_led_status), "LED: OFF");
+          lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0xFF3D00), 0);
 
   # Calibration buttons (no-ops in simulator, present for entity parity)
   - platform: template
@@ -836,41 +868,54 @@ interval:
           id(moisture_3_percent).publish_state(id(sim_moisture_3));
           } // end rain_ever_started guard
 
-          // --- Sleep wake-up timer ---
-          if (id(sleep_sequence_active)) {
-            unsigned long elapsed_ms = millis() - id(sleep_sequence_start_time);
-            unsigned long sleep_ms = (unsigned long)id(sleep_duration_minutes) * 60UL * 1000UL;
-            if (elapsed_ms >= sleep_ms) {
-              id(sleep_sequence_active) = false;
+          // --- Sleep/Wake cycle ---
+          // Simulates real sensor: boots, stays awake 2 min, sleeps for sleep_duration, repeats
+          // If Disable Sleep is ON, LED stays on forever
+
+          if (id(sleep_disabled)) {
+            // Sleep disabled: ensure LED is on and device is awake
+            if (!id(device_awake)) {
               id(device_awake) = true;
+              id(sleep_sequence_active) = false;
               id(status_led_state) = true;
-              id(awake_start_time) = millis();
-              // Turn virtual LED back on
               auto call = id(status_led).turn_on();
               call.perform();
-              // Update UI labels
               lv_label_set_text(id(lbl_awake_status), "AWAKE");
               lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0x00E676), 0);
               lv_label_set_text(id(lbl_sleep_btn), "SLEEP");
               lv_label_set_text(id(lbl_led_status), "LED: ON");
               lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0x00E676), 0);
             }
-          }
-
-          // --- Auto-sleep timer (simulates real device behavior) ---
-          // Only auto-sleep if: awake, wifi connected, sleep not disabled, not already sleeping
-          if (id(device_awake) && !id(sleep_sequence_active) && !id(sleep_disabled) && id(wifi_sta_connected)) {
+          } else if (id(sleep_sequence_active)) {
+            // Currently sleeping (LED off) — check if sleep_duration has elapsed
+            unsigned long elapsed_ms = millis() - id(sleep_sequence_start_time);
+            unsigned long sleep_ms = (unsigned long)id(sleep_duration_minutes) * 60UL * 1000UL;
+            if (elapsed_ms >= sleep_ms) {
+              // Wake up: LED on, start 2-min awake timer
+              id(sleep_sequence_active) = false;
+              id(device_awake) = true;
+              id(status_led_state) = true;
+              id(awake_start_time) = millis();
+              auto call = id(status_led).turn_on();
+              call.perform();
+              lv_label_set_text(id(lbl_awake_status), "AWAKE");
+              lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0x00E676), 0);
+              lv_label_set_text(id(lbl_sleep_btn), "SLEEP");
+              lv_label_set_text(id(lbl_led_status), "LED: ON");
+              lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0x00E676), 0);
+            }
+          } else if (id(device_awake) && id(awake_start_time) > 0) {
+            // Currently awake with timer running — check if 2 minutes have elapsed
             unsigned long awake_ms = millis() - id(awake_start_time);
-            unsigned long max_awake_ms = (unsigned long)id(max_awake_input).state * 60UL * 1000UL;
-            if (awake_ms >= max_awake_ms) {
-              // Auto-sleep: turn off LED, mark as sleeping
+            if (awake_ms >= 120000UL) {
+              // 2 minutes up: go to sleep (LED off)
               id(device_awake) = false;
               id(sleep_sequence_active) = true;
               id(sleep_sequence_start_time) = millis();
+              id(awake_start_time) = 0;
               id(status_led_state) = false;
               auto call = id(status_led).turn_off();
               call.perform();
-              // Update UI labels
               lv_label_set_text(id(lbl_awake_status), "SLEEPING");
               lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0xFF3D00), 0);
               lv_label_set_text(id(lbl_sleep_btn), "WAKE");
@@ -1238,39 +1283,33 @@ lvgl:
               then:
                 - lambda: |-
                     if (id(device_awake)) {
+                      // Manual sleep: LED off, start sleep timer
                       id(device_awake) = false;
                       id(sleep_sequence_active) = true;
                       id(sleep_sequence_start_time) = millis();
+                      id(awake_start_time) = 0;
+                      id(status_led_state) = false;
+                      auto off = id(status_led).turn_off();
+                      off.perform();
                       lv_label_set_text(id(lbl_awake_status), "SLEEPING");
                       lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0xFF3D00), 0);
                       lv_label_set_text(id(lbl_sleep_btn), "WAKE");
+                      lv_label_set_text(id(lbl_led_status), "LED: OFF");
+                      lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0xFF3D00), 0);
                     } else {
+                      // Manual wake: LED on, start 2-min awake timer
                       id(device_awake) = true;
                       id(sleep_sequence_active) = false;
+                      id(status_led_state) = true;
                       id(awake_start_time) = millis();
+                      auto on = id(status_led).turn_on();
+                      on.perform();
                       lv_label_set_text(id(lbl_awake_status), "AWAKE");
                       lv_obj_set_style_text_color(id(lbl_awake_status), lv_color_hex(0x00E676), 0);
                       lv_label_set_text(id(lbl_sleep_btn), "SLEEP");
+                      lv_label_set_text(id(lbl_led_status), "LED: ON");
+                      lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0x00E676), 0);
                     }
-                - if:
-                    condition:
-                      lambda: 'return !id(device_awake);'
-                    then:
-                      - light.turn_off:
-                          id: status_led
-                      - lvgl.label.update:
-                          id: lbl_led_status
-                          text: "LED: OFF"
-                      - lambda: |-
-                          lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0xFF3D00), 0);
-                    else:
-                      - light.turn_on:
-                          id: status_led
-                      - lvgl.label.update:
-                          id: lbl_led_status
-                          text: "LED: ON"
-                      - lambda: |-
-                          lv_obj_set_style_text_color(id(lbl_led_status), lv_color_hex(0x00E676), 0);
 
     # ──────── PAGE: SIM MODE SELECT ────────
     - id: page_sim_select
