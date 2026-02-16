@@ -5,7 +5,7 @@
     {
       "chipFamily": "ESP32-S3",
       "ota": {
-        "md5": "114ad4b2579d592d79ee219e58ef4713",
+        "md5": "ab83ee44af72f0fd352f8b1ad95e15e2",
         "path": "https://github.com/FluxOpenHome/Gophr/releases/download/gophr-sim-v1.4.5-sim/gophr-sim-1.4.5-sim.ota.bin",
         "release_url": "https://github.com/FluxOpenHome/Gophr/releases/tag/gophr-sim-v1.4.5-sim",
         "summary": "Update 1.4.5-sim"
