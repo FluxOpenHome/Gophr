@@ -18,7 +18,8 @@
 #define GPIO_LED_ENABLE         18
 
 /* LED */
-#define GPIO_STATUS_LED         10
+#define GPIO_STATUS_LED         10  /* Gophr PCB */
+#define GPIO_DEVKIT_LED         8   /* ESP32-C6-DevKitC-1 onboard RGB */
 
 /* I2C */
 #define GPIO_I2C_SDA            19

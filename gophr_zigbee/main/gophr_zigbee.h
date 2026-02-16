@@ -12,11 +12,11 @@
 #define GOPHR_EP_MOISTURE_3     5   /* Soil Moisture 3 (as humidity %) */
 
 /* ---------- Device Info ---------- */
-#define GOPHR_MANUFACTURER_NAME "\x05""GOPHR"       /* ZCL string: length-prefixed */
-#define GOPHR_MODEL_IDENTIFIER  "\x08""Gophr-C6"
+#define GOPHR_MANUFACTURER_NAME "\x0c""FluxOpenHome"  /* ZCL string: length-prefixed */
+/* Model identifier is built at runtime: "Gophr XXXXXXXXXXXX" (MAC appended) */
 
 /* ---------- ZED Configuration ---------- */
-#define GOPHR_ZED_TIMEOUT       ESP_ZB_ZED_TIMEOUT_64MIN
+#define GOPHR_ZED_TIMEOUT       ESP_ZB_ED_AGING_TIMEOUT_64MIN
 #define GOPHR_ZED_KEEP_ALIVE    3000  /* ms */
 
 /* ---------- Reporting Intervals ---------- */

@@ -7,6 +7,7 @@
 #include "driver/i2c_master.h"
 #include "led_strip.h"
 #include "esp_log.h"
+#include "esp_check.h"
 
 #include <string.h>
 #include <math.h>
@@ -222,40 +223,69 @@ void gophr_led_power(bool enable)
 /* ---------- WS2812B LED ---------- */
 
 static led_strip_handle_t s_led_strip = NULL;
+static led_strip_handle_t s_devkit_led = NULL;
 
 esp_err_t gophr_led_init(void)
 {
-    led_strip_config_t strip_cfg = {
-        .strip_gpio_num = GPIO_STATUS_LED,
-        .max_leds = 1,
-        .led_model = LED_MODEL_WS2812,
-        .color_component_format = LED_STRIP_COLOR_COMPONENT_FMT_GRB,
-        .flags.invert_out = false,
-    };
-
     led_strip_rmt_config_t rmt_cfg = {
         .clk_src = RMT_CLK_SRC_DEFAULT,
         .resolution_hz = 10 * 1000 * 1000, /* 10 MHz */
         .flags.with_dma = false,
     };
 
+    /* Gophr PCB LED on GPIO10 */
+    led_strip_config_t strip_cfg = {
+        .strip_gpio_num = GPIO_STATUS_LED,
+        .max_leds = 1,
+        .led_pixel_format = LED_PIXEL_FORMAT_GRB,
+        .led_model = LED_MODEL_WS2812,
+        .flags.invert_out = false,
+    };
     ESP_RETURN_ON_ERROR(led_strip_new_rmt_device(&strip_cfg, &rmt_cfg, &s_led_strip),
                         TAG, "LED strip init failed");
-
     led_strip_clear(s_led_strip);
     ESP_LOGI(TAG, "WS2812B LED initialized on GPIO%d", GPIO_STATUS_LED);
+
+    /* DevKit onboard RGB LED on GPIO8 */
+    led_strip_config_t devkit_cfg = {
+        .strip_gpio_num = GPIO_DEVKIT_LED,
+        .max_leds = 1,
+        .led_pixel_format = LED_PIXEL_FORMAT_GRB,
+        .led_model = LED_MODEL_WS2812,
+        .flags.invert_out = false,
+    };
+    esp_err_t ret = led_strip_new_rmt_device(&devkit_cfg, &rmt_cfg, &s_devkit_led);
+    if (ret == ESP_OK) {
+        led_strip_clear(s_devkit_led);
+        ESP_LOGI(TAG, "DevKit LED initialized on GPIO%d", GPIO_DEVKIT_LED);
+    } else {
+        ESP_LOGW(TAG, "DevKit LED on GPIO%d not available", GPIO_DEVKIT_LED);
+        s_devkit_led = NULL;
+    }
+
     return ESP_OK;
 }
 
 void gophr_led_set_color(uint8_t r, uint8_t g, uint8_t b)
 {
-    if (!s_led_strip) return;
-    led_strip_set_pixel(s_led_strip, 0, r, g, b);
-    led_strip_refresh(s_led_strip);
+    if (s_led_strip) {
+        led_strip_set_pixel(s_led_strip, 0, r, g, b);
+        led_strip_refresh(s_led_strip);
+    }
+    if (s_devkit_led) {
+        led_strip_set_pixel(s_devkit_led, 0, r, g, b);
+        led_strip_refresh(s_devkit_led);
+    }
 }
 
 void gophr_led_off(void)
 {
-    if (!s_led_strip) return;
-    led_strip_clear(s_led_strip);
+    if (s_led_strip) {
+        led_strip_set_pixel(s_led_strip, 0, 0, 0, 0);
+        led_strip_refresh(s_led_strip);
+    }
+    if (s_devkit_led) {
+        led_strip_set_pixel(s_devkit_led, 0, 0, 0, 0);
+        led_strip_refresh(s_devkit_led);
+    }
 }

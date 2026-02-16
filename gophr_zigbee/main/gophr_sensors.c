@@ -2,6 +2,7 @@
 #include "gophr_drivers.h"
 
 #include "esp_log.h"
+#include "esp_check.h"
 #include "nvs_flash.h"
 #include "nvs.h"
 

@@ -1,0 +1,209 @@
+ESP-ROM:esp32c6-20220919
+Build:Sep 19 2022
+rst:0x15 (USB_UART_HPSYS),boot:0xc (SPI_FAST_FLASH_BOOT)
+Saved PC:0x40807aac
+SPIWP:0xee
+mode:DIO, clock div:2
+load:0x40875720,len:0x18ec
+load:0x4086c110,len:0xe5c
+load:0x4086e610,len:0x2f50
+entry 0x4086c11a
+[0;32mI (23) boot: ESP-IDF v5.3.2-dirty 2nd stage bootloader[0m
+[0;32mI (23) boot: compile time Feb 16 2026 15:16:43[0m
+[0;32mI (24) boot: chip revision: v0.1[0m
+[0;32mI (26) boot: efuse block revision: v0.3[0m
+[0;32mI (31) boot.esp32c6: SPI Speed      : 80MHz[0m
+[0;32mI (36) boot.esp32c6: SPI Mode       : DIO[0m
+[0;32mI (40) boot.esp32c6: SPI Flash Size : 2MB[0m
+[0;32mI (45) boot: Enabling RNG early entropy source...[0m
+[0;32mI (50) boot: Partition Table:[0m
+[0;32mI (54) boot: ## Label            Usage          Type ST Offset   Length[0m
+[0;32mI (61) boot:  0 nvs              WiFi data        01 02 00009000 00006000[0m
+[0;32mI (69) boot:  1 phy_init         RF data          01 01 0000f000 00001000[0m
+[0;32mI (76) boot:  2 factory          factory app      00 00 00010000 000e1000[0m
+[0;32mI (84) boot:  3 zb_storage       Unknown data     01 81 000f1000 00004000[0m
+[0;32mI (91) boot:  4 zb_fct           Unknown data     01 81 000f5000 00000400[0m
+[0;32mI (99) boot: End of partition table[0m
+[0;32mI (103) esp_image: segment 0: paddr=00010020 vaddr=42060020 size=12034h ( 73780) map[0m
+[0;32mI (125) esp_image: segment 1: paddr=0002205c vaddr=40800000 size=05fbch ( 24508) load[0m
+[0;32mI (131) esp_image: segment 2: paddr=00028020 vaddr=42000020 size=5c068h (376936) map[0m
+[0;32mI (203) esp_image: segment 3: paddr=00084090 vaddr=40805fbc size=0aac0h ( 43712) load[0m
+[0;32mI (213) esp_image: segment 4: paddr=0008eb58 vaddr=40810a80 size=02500h (  9472) load[0m
+[0;32mI (216) esp_image: segment 5: paddr=00091060 vaddr=50000000 size=0005ch (    92) load[0m
+[0;32mI (219) esp_image: segment 6: paddr=000910c4 vaddr=5000005c size=00008h (     8) load[0m
+[0;32mI (231) boot: Loaded app from partition at offset 0x10000[0m
+[0;32mI (234) boot: Disabling RNG early entropy source...[0m
+[0;32mI (251) cpu_start: Unicore app[0m
+[0;32mI (260) cpu_start: Pro cpu start user code[0m
+[0;32mI (260) cpu_start: cpu freq: 160000000 Hz[0m
+[0;32mI (260) app_init: Application information:[0m
+[0;32mI (263) app_init: Project name:     gophr_zigbee[0m
+[0;32mI (268) app_init: App version:      gophr-sim-v1.4.5-sim-1-gc73b9c9[0m
+[0;32mI (275) app_init: Compile time:     Feb 16 2026 15:15:27[0m
+[0;32mI (281) app_init: ELF file SHA256:  513624a11...[0m
+[0;32mI (286) app_init: ESP-IDF:          v5.3.2-dirty[0m
+[0;32mI (291) efuse_init: Min chip rev:     v0.0[0m
+[0;32mI (296) efuse_init: Max chip rev:     v0.99 [0m
+[0;32mI (301) efuse_init: Chip rev:         v0.1[0m
+[0;32mI (306) heap_init: Initializing. RAM available for dynamic allocation:[0m
+[0;32mI (313) heap_init: At 40817440 len 000651D0 (404 KiB): RAM[0m
+[0;32mI (319) heap_init: At 4087C610 len 00002F54 (11 KiB): RAM[0m
+[0;32mI (325) heap_init: At 50000064 len 00003F84 (15 KiB): RTCRAM[0m
+[0;32mI (332) spi_flash: detected chip: generic[0m
+[0;32mI (336) spi_flash: flash io: dio[0m
+[0;33mW (340) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.[0m
+[0;32mI (354) sleep: Configure to isolate all GPIO pins in sleep state[0m
+[0;32mI (360) sleep: Enable automatic switching of GPIO sleep configuration[0m
+[0;32mI (367) coexist: coex firmware version: cbb41d7[0m
+[0;32mI (373) coexist: coexist rom version 5b8dcfa[0m
+[0;32mI (378) main_task: Started on CPU0[0m
+[0;32mI (378) main_task: Calling app_main()[0m
+[0;32mI (378) gophr_main: === Gophr Zigbee Sensor v1.0 ===[0m
+[0;32mI (398) gophr_main: === GOPHR Boot Sequence ===[0m
+[0;32mI (398) gpio: GPIO[6]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (398) gpio: GPIO[7]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (408) gpio: GPIO[18]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (418) gophr_drivers: GPIO power pins initialized (6, 7, 18)[0m
+[0;32mI (428) gophr_main: Powering on sensor rail (GPIO6)...[0m
+[0;32mI (428) gophr_drivers: Sensor power ON[0m
+[0;32mI (5438) gpio: GPIO[1]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5438) gpio: GPIO[2]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5438) gpio: GPIO[3]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5448) gpio: GPIO[0]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5458) gpio: GPIO[4]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5468) gophr_drivers: ADC initialized (5 channels, 12-bit, 12dB atten)[0m
+[0;32mI (5478) gophr_main: Powering on AHT20 (GPIO7) and LED (GPIO18)...[0m
+[0;32mI (5478) gophr_drivers: AHT20 power ON[0m
+[0;32mI (5488) gophr_drivers: LED power ON[0m
+[0;32mI (7488) gpio: GPIO[19]| InputEn: 1| OutputEn: 1| OpenDrain: 1| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (7488) gpio: GPIO[9]| InputEn: 1| OutputEn: 1| OpenDrain: 1| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;31mE (7528) i2c.master: I2C transaction unexpected nack detected[0m
+[0;31mE (7528) i2c.master: s_i2c_synchronous_transaction(888): I2C transaction failed[0m
+[0;31mE (7528) i2c.master: i2c_master_transmit(1116): I2C transaction failed[0m
+[0;33mW (7538) gophr_drivers: AHT20 init command failed (may already be initialized)[0m
+[0;32mI (7548) gophr_drivers: I2C initialized (SDA=19, SCL=9), AHT20 at 0x38[0m
+[0;32mI (7548) gpio: GPIO[10]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (7558) gophr_drivers: WS2812B LED initialized on GPIO10[0m
+[0;32mI (7568) gophr_main: LED: Blue (booting)[0m
+[0;32mI (7568) gophr_sensors: Sensor 1 cal: dry=1.979V (Factory), wet=1.388V (Factory)[0m
+[0;32mI (7578) gophr_sensors: Sensor 2 cal: dry=1.979V (Factory), wet=1.388V (Factory)[0m
+[0;32mI (7588) gophr_sensors: Sensor 3 cal: dry=2.046V (Factory), wet=1.391V (Factory)[0m
+[0;32mI (7598) gophr_sensors: Sensor subsystem initialized[0m
+[0;33mW (7598) gophr_sleep: No sleep config in NVS, using defaults[0m
+[0;32mI (7608) gophr_main: === Boot Sequence Complete ===[0m
+[0;32mI (7608) phy_init: phy_version 320,348a293,Sep  3 2024,16:33:12[0m
+[0;32mI (7688) phy: libbtbb version: 04952fd, Sep  3 2024, 16:33:30[0m
+[0;32mI (7688) gophr_zigbee: Zigbee device registered with 5 endpoints[0m
+[0;32mI (7688) gophr_main: Zigbee stack initialized, starting...[0m
+[0;32mI (7698) gophr_main: All tasks started[0m
+[0;32mI (7698) main_task: Returned from app_main()[0m
+[0;32mI (7708) gophr_zigbee: ZDO signal: ZDO Config Ready (0x17), status: ESP_FAIL[0m
+[0;32mI (7708) gophr_zigbee: Initialize Zigbee stack[0m
+[0;32mI (7718) gophr_zigbee: Device started up in factory-reset mode[0m
+[0;32mI (7718) gophr_zigbee: Start network steering[0m
+[0;32mI (9978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (13228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (16478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (17698) gophr_main: Sensor task started[0m
+[0;31mE (17698) i2c.master: I2C transaction unexpected nack detected[0m
+[0;31mE (17698) i2c.master: s_i2c_synchronous_transaction(888): I2C transaction failed[0m
+[0;31mE (17698) i2c.master: i2c_master_transmit(1116): I2C transaction failed[0m
+[0;31mE (17708) gophr_drivers: gophr_aht20_read(152): AHT20 trigger failed[0m
+[0;32mI (19728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (22978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (26228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (29478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (32728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (35978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (39228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (42478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (45728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (48978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (52228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (55478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (58728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (61978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (65228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (68478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (71728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (74978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;31mE (77718) i2c.master: I2C transaction unexpected nack detected[0m
+[0;31mE (77718) i2c.master: s_i2c_synchronous_transaction(888): I2C transaction failed[0m
+[0;31mE (77718) i2c.master: i2c_master_transmit(1116): I2C transaction failed[0m
+[0;31mE (77728) gophr_drivers: gophr_aht20_read(152): AHT20 trigger failed[0m
+[0;32mI (78228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (81478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (84728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (87978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (91228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (94478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (97728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (100978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (104228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (107478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (110728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (113978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (117228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (120478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (123728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (126978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (130228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (133478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (136728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;31mE (137728) i2c.master: I2C transaction unexpected nack detected[0m
+[0;31mE (137728) i2c.master: s_i2c_synchronous_transaction(888): I2C transaction failed[0m
+[0;31mE (137728) i2c.master: i2c_master_transmit(1116): I2C transaction failed[0m
+[0;31mE (137738) gophr_drivers: gophr_aht20_read(152): AHT20 trigger failed[0m
+[0;32mI (139978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (143228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (146478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (149728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (152978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (156228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (159478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (162728) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (165978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (5438) gpio: GPIO[1]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5438) gpio: GPIO[2]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5438) gpio: GPIO[3]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5448) gpio: GPIO[0]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5458) gpio: GPIO[4]| InputEn: 0| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 [0m
+[0;32mI (5468) gophr_drivers: ADC initialized (5 channels, 12-bit, 12dB atten)[0m
+[0;32mI (5478) gophr_main: Powering on AHT20 (GPIO7) and LED (GPIO18)...[0m
+[0;32mI (5478) gophr_drivers: AHT20 power ON[0m
+[0;32mI (5488) gophr_drivers: LED power ON[0m
+[0;32mI (7488) gpio: GPIO[19]| InputEn: 1| OutputEn: 1| OpenDrain: 1| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (7488) gpio: GPIO[9]| InputEn: 1| OutputEn: 1| OpenDrain: 1| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;31mE (7528) i2c.master: I2C transaction unexpected nack detected[0m
+[0;31mE (7528) i2c.master: s_i2c_synchronous_transaction(888): I2C transaction failed[0m
+[0;31mE (7528) i2c.master: i2c_master_transmit(1116): I2C transaction failed[0m
+[0;33mW (7538) gophr_drivers: AHT20 init command failed (may already be initialized)[0m
+[0;32mI (7548) gophr_drivers: I2C initialized (SDA=19, SCL=9), AHT20 at 0x38[0m
+[0;32mI (7548) gpio: GPIO[10]| InputEn: 0| OutputEn: 1| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 [0m
+[0;32mI (7558) gophr_drivers: WS2812B LED initialized on GPIO10[0m
+[0;32mI (7568) gophr_main: LED: Blue (booting)[0m
+[0;32mI (7568) gophr_sensors: Sensor 1 cal: dry=1.979V (Factory), wet=1.388V (Factory)[0m
+[0;32mI (7578) gophr_sensors: Sensor 2 cal: dry=1.979V (Factory), wet=1.388V (Factory)[0m
+[0;32mI (7588) gophr_sensors: Sensor 3 cal: dry=2.046V (Factory), wet=1.391V (Factory)[0m
+[0;32mI (7598) gophr_sensors: Sensor subsystem initialized[0m
+[0;33mW (7598) gophr_sleep: No sleep config in NVS, using defaults[0m
+[0;32mI (7608) gophr_main: === Boot Sequence Complete ===[0m
+[0;32mI (7608) phy_init: phy_version 320,348a293,Sep  3 2024,16:33:12[0m
+[0;32mI (7688) phy: libbtbb version: 04952fd, Sep  3 2024, 16:33:30[0m
+[0;32mI (7688) gophr_zigbee: Zigbee device registered with 5 endpoints[0m
+[0;32mI (7688) gophr_main: Zigbee stack initialized, starting...[0m
+[0;32mI (7698) gophr_main: All tasks started[0m
+[0;32mI (7698) main_task: Returned from app_main()[0m
+[0;32mI (7708) gophr_zigbee: ZDO signal: ZDO Config Ready (0x17), status: ESP_FAIL[0m
+[0;32mI (7708) gophr_zigbee: Initialize Zigbee stack[0m
+[0;32mI (7718) gophr_zigbee: Device started up in factory-reset mode[0m
+[0;32mI (7718) gophr_zigbee: Start network steering[0m
+[0;32mI (9978) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (13228) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (16478) gophr_zigbee: Network steering failed (status: ESP_FAIL), retrying...[0m
+[0;32mI (17698) gophr_main: Sensor task started[0m
+[0;31mE (17698) i2c.master: I2C transaction unexpected nack detected[0m
+[0;31mE (17698) i2c.master: s_i2c_synchronous_transaction(888): I2C transaction failed[0m
+[0;31mE (17698) i2c.master: i2c_master_transmit(1116): I2C transaction failed[0m
+[0;31mE (17708) gophr_drivers: gophr_aht20_read(152): AHT20 trigger failed[0m
+[0;32mI (19728) gophr_zigbee: Network steering failed (status: ESP_FAIL

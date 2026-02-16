@@ -1,0 +1,1 @@
+ninja: error: '/Users/brandonhalterman/Documents/GitHub/Gophr/gophr_zigbee/main/gophr_main.c', needed by 'esp-idf/main/CMakeFiles/__idf_main.dir/gophr_main.c.obj', missing and no known rule to make it

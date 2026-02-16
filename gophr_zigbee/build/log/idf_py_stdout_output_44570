@@ -1,0 +1,12 @@
+esptool.py v4.8.1
+Serial port /dev/cu.usbmodem59710794501
+Connecting....
+Chip is ESP32-C6 (QFN40) (revision v0.1)
+Features: WiFi 6, BT 5, IEEE802.15.4
+Crystal is 40MHz
+MAC: f0:f5:bd:ff:fe:0a:1b:78
+BASE MAC: f0:f5:bd:0a:1b:78
+MAC_EXT: ff:fe
+Uploading stub...
+
+A fatal error occurred: Failed to write to target RAM (result was 01070000: Operation timed out)

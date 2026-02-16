@@ -3,10 +3,52 @@
 
 #include "esp_log.h"
 #include "esp_check.h"
+#include "esp_mac.h"
 #include "ha/esp_zigbee_ha_standard.h"
+#include "zcl/esp_zigbee_zcl_power_config.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include <stdio.h>
+#include <string.h>
 
 static const char *TAG = "gophr_zigbee";
 static bool s_joined = false;
+static TaskHandle_t s_blink_task_handle = NULL;
+
+/* ---------- Pairing Blink Task ---------- */
+
+static void pairing_blink_task(void *arg)
+{
+    bool led_on = false;
+    while (!s_joined) {
+        if (led_on) {
+            gophr_led_off();
+        } else {
+            gophr_led_set_color(0, 0, 76); /* Blue */
+        }
+        led_on = !led_on;
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+    /* Joined — set solid green and clean up */
+    gophr_led_set_color(0, 76, 0);
+    s_blink_task_handle = NULL;
+    vTaskDelete(NULL);
+}
+
+/* ---------- Model Identifier with MAC ---------- */
+
+/* ZCL string: "Gophr XXXXXXXXXXXX" = 5 + 1 + 12 = 18 chars, length-prefixed */
+static char s_model_id[20]; /* [len_byte] + "Gophr " + 12 hex MAC + null */
+
+static void build_model_identifier(void)
+{
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_IEEE802154);
+    snprintf(s_model_id + 1, sizeof(s_model_id) - 1,
+             "Gophr %02X%02X%02X%02X%02X%02X",
+             mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    s_model_id[0] = (char)strlen(s_model_id + 1); /* ZCL length prefix */
+}
 
 /* ---------- Helpers ---------- */
 
@@ -35,7 +77,7 @@ static esp_zb_cluster_list_t *create_temperature_endpoint_clusters(void)
     ESP_ERROR_CHECK(esp_zb_basic_cluster_add_attr(basic_cluster,
         ESP_ZB_ZCL_ATTR_BASIC_MANUFACTURER_NAME_ID, (void *)GOPHR_MANUFACTURER_NAME));
     ESP_ERROR_CHECK(esp_zb_basic_cluster_add_attr(basic_cluster,
-        ESP_ZB_ZCL_ATTR_BASIC_MODEL_IDENTIFIER_ID, (void *)GOPHR_MODEL_IDENTIFIER));
+        ESP_ZB_ZCL_ATTR_BASIC_MODEL_IDENTIFIER_ID, (void *)s_model_id));
     ESP_ERROR_CHECK(esp_zb_cluster_list_add_basic_cluster(cluster_list, basic_cluster,
         ESP_ZB_ZCL_CLUSTER_SERVER_ROLE));
 
@@ -106,6 +148,9 @@ static esp_zb_cluster_list_t *create_humidity_endpoint_clusters(void)
 
 esp_err_t gophr_zigbee_create_device(void)
 {
+    build_model_identifier();
+    ESP_LOGI(TAG, "Model: %s", s_model_id + 1);
+
     esp_zb_ep_list_t *ep_list = esp_zb_ep_list_create();
 
     /* Endpoint 1: Temperature + Power Config */
@@ -321,6 +366,9 @@ void gophr_zigbee_signal_handler(esp_zb_app_signal_t *signal_struct)
                      esp_zb_bdb_is_factory_new() ? "" : " non");
             if (esp_zb_bdb_is_factory_new()) {
                 ESP_LOGI(TAG, "Start network steering");
+                if (s_blink_task_handle == NULL) {
+                    xTaskCreate(pairing_blink_task, "blink", 2048, NULL, 3, &s_blink_task_handle);
+                }
                 esp_zb_bdb_start_top_level_commissioning(ESP_ZB_BDB_MODE_NETWORK_STEERING);
             } else {
                 ESP_LOGI(TAG, "Device rebooted, already on network");
